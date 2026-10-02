@@ -102,7 +102,7 @@ test('a simple touch still opens the project', t => {
   assert.equal(opened, 1);
 });
 
-test('vertical touch leaves the native scroll gesture available', t => {
+test('vertical movement does not drag the gallery and cancellation releases autoplay', t => {
   const g = gallery(t);
   const before = g.position();
   g.pointer('pointerdown', 200);
