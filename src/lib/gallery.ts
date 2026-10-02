@@ -153,7 +153,7 @@ export function initGallery(root: HTMLElement) {
     const scale = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewport.clientWidth : 1;
     target += (horizontal ? event.deltaX : event.deltaY) * scale;
     velocity = 0;
-    resumeAt = performance.now() + RESUME_DELAY;
+    resumeAt = 0;
   }, { passive: false, signal });
   document.addEventListener('pointermove', event => {
     if (event.pointerType !== 'mouse') return;
