@@ -1,4 +1,4 @@
-import { copiesFor, wrap } from './gallery-math';
+import { copiesFor, wrap } from './gallery-math.ts';
 
 const AUTO_SPEED = 50; // Pixels per second, independent of display refresh rate.
 const RESUME_DELAY = 1400;
@@ -12,6 +12,7 @@ export function initGallery(root: HTMLElement) {
   if (!group.children.length) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const canHover = window.matchMedia('(hover: hover)');
   let cycle = 0;
   let position = 0;
   let target = 0;
@@ -87,9 +88,10 @@ export function initGallery(root: HTMLElement) {
   }
 
   viewport.addEventListener('pointerdown', event => {
-    if (event.button !== 0 || !event.isPrimary || modalOpen) return;
+    if (event.button !== 0 || !event.isPrimary || modalOpen || pointer !== null) return;
     // Keep presentation copies out of focus; native click still fires on release.
-    event.preventDefault();
+    if (event.pointerType === 'mouse') event.preventDefault();
+    else hovering = false;
     suppressClickUntil = 0;
     pointer = event.pointerId;
     startX = event.clientX;
@@ -104,7 +106,9 @@ export function initGallery(root: HTMLElement) {
   viewport.addEventListener('pointermove', event => {
     if (event.pointerId !== pointer) return;
     if (!dragged) {
-      if (Math.hypot(event.clientX - startX, event.clientY - startY) < 6) return;
+      const dx = Math.abs(event.clientX - startX);
+      const dy = Math.abs(event.clientY - startY);
+      if (dx < 6 || (event.pointerType !== 'mouse' && dy > dx)) return;
       dragged = true;
       viewport.setPointerCapture(event.pointerId);
       root.dataset.dragging = 'true';
@@ -120,8 +124,11 @@ export function initGallery(root: HTMLElement) {
   }, { signal });
   function release(event: PointerEvent) {
     if (event.pointerId !== pointer) return;
+    // Touch implicitly captures the image first. Its capture loss bubbles when
+    // we transfer capture to the viewport; that transfer must not end the drag.
+    if (event.type === 'lostpointercapture' && event.target !== viewport) return;
     if (dragged || event.type === 'pointercancel') suppressClickUntil = performance.now() + 400;
-    if (event.type === 'pointercancel' || event.timeStamp - lastPointerTime > 100 || reduced.matches) velocity = 0;
+    if (event.type !== 'pointerup' || event.timeStamp - lastPointerTime > 100 || reduced.matches) velocity = 0;
     pointer = null;
     delete root.dataset.dragging;
     resumeAt = performance.now() + RESUME_DELAY;
@@ -141,7 +148,7 @@ export function initGallery(root: HTMLElement) {
     velocity = 0;
     target = position;
     focused = false;
-    hovering = Boolean(root.querySelector('.project-image:hover'));
+    hovering = canHover.matches && Boolean(root.querySelector('.project-image:hover'));
     resumeAt = performance.now() + RESUME_DELAY;
   }, { signal });
   window.addEventListener('wheel', event => {
