@@ -4,7 +4,7 @@ import ProjectCover from './ProjectCover.astro';
 interface Props { project: Project }
 const { project } = Astro.props;
 ---
-<button class="project-card" type="button" tabindex="-1" aria-label={`Abrir projeto: ${project.title}`} aria-haspopup="dialog" data-project-id={project.id}>
+<button class="project-card" type="button" tabindex="-1" aria-label={`Open project: ${project.title}`} aria-haspopup="dialog" data-project-id={project.id}>
   <ProjectCover cover={project.cover} />
   <span class="project-caption"><span aria-hidden="true">↗</span> {project.title}</span>
 </button>

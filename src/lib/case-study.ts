@@ -13,7 +13,7 @@ export function initCaseStudy(page: HTMLElement) {
     sidebar.inert = expanded;
     sidebar.setAttribute('aria-hidden', String(expanded));
     toggle.setAttribute('aria-expanded', String(expanded));
-    toggle.setAttribute('aria-label', expanded ? 'Mostrar descrição do projeto' : 'Expandir imagens do projeto');
+    toggle.setAttribute('aria-label', expanded ? 'Show project description' : 'Expand project images');
     label.textContent = expanded ? 'Description' : 'full screen';
   }
   toggle.addEventListener('click', () => setExpanded(!expanded), { signal });

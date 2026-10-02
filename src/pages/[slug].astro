@@ -11,11 +11,11 @@ const detail = project.caseStudy;
 ---
 <Layout title={`${project.title} — barbz-zip`}>
   <main id="main" class="case-study" data-case-study>
-    <button class="case-expand pill-button" type="button" data-expand-case aria-expanded="false" aria-controls="case-media" aria-label="Expandir imagens do projeto">
+    <button class="case-expand pill-button" type="button" data-expand-case aria-expanded="false" aria-controls="case-media" aria-label="Expand project images">
       <img src={sitePath('/images/expand.svg')} width="10" height="10" alt="" />
       <span data-expand-label>full screen</span>
     </button>
-    <aside class="case-sidebar" data-case-sidebar aria-label="Informações do projeto">
+    <aside class="case-sidebar" data-case-sidebar aria-label="Project information">
       <div class="case-heading">
         <a href={sitePath('/')} class="case-back pill-button"><img src={sitePath('/images/back.svg')} width="9" height="9" alt="" />Back</a>
         <div class="case-heading-copy">
@@ -37,7 +37,7 @@ const detail = project.caseStudy;
         </div>
       </div>
     </aside>
-    <div id="case-media" class="case-media" aria-label={`Imagens de ${project.title}`}>
+    <div id="case-media" class="case-media" aria-label={`Images for ${project.title}`}>
       {detail.gallery.map((row, rowIndex) => (
         <div class:list={['case-media-row', `case-media-row--${row.layout}`, `case-media-row--${row.orientation}`]} data-row-key={row.key}>
           {row.images.map(img => <figure><img src={sitePath(img.src)} alt={img.alt} loading={rowIndex === 0 ? 'eager' : 'lazy'} fetchpriority={rowIndex === 0 ? 'high' : 'auto'} decoding="async" /></figure>)}

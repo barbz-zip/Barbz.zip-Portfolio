@@ -7,7 +7,7 @@ import { about } from '../data/about';
   <main id="main" class="about-page">
     <h1 class="sr-only">About — {about.name}</h1>
     <figure class="about-profile">
-      <div class="about-portrait"><img src={sitePath(about.portrait)} alt={`Retrato de ${about.name}, vestindo uma jaqueta vermelha.`} fetchpriority="high" decoding="async" /></div>
+      <div class="about-portrait"><img src={sitePath(about.portrait)} alt={`Portrait of ${about.name} wearing a red jacket.`} fetchpriority="high" decoding="async" /></div>
       <figcaption><span>{about.name}</span><br />{about.caption}</figcaption>
     </figure>
     <div class="about-content" lang="en">

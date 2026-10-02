@@ -24,15 +24,15 @@ export interface Project extends ProjectPreview { caseStudy: CaseStudy }
 // Local preview content. The future Sanity adapter returns this same contract.
 // Each project is stored once; the gallery creates only presentation copies.
 const projects: ProjectPreview[] = [
-  { id: 'chelsea', slug: 'chelsea-film-festival', title: 'Chelsea Film Festival', year: '2025', description: 'Graphic Design • Typography', cover: { src: '/images/projects/chelsea.png', alt: 'Chelsea Film Festival, tipografia branca sobre textura preta e rosa.' } },
-  { id: 'gunga-web', slug: 'ginga', title: 'Ginga', year: '2025', description: 'Creative Direction • Graphic Design', cover: { src: '/images/projects/gunga-web.png', alt: 'Identidade Ginga apresentada em uma televisão sobre um móvel de madeira.' } },
-  { id: 'nursegrid', slug: 'nursegrid', title: 'Nursegrid Recap', year: '2025', description: 'Graphic Design • 2025 Recap', cover: { src: '/images/projects/nursegrid.png', alt: 'Nursegrid 2025 recap, números geométricos coloridos sobre azul.', crop: 'nursegrid' } },
-  { id: 'gunga', slug: 'gunga', title: 'Gunga', year: '2025', description: 'Visual Identity • Graphic Design', cover: { src: '/images/projects/gunga.png', alt: 'Identidade Gunga, composição circular tipográfica em rosa, verde e preto.', crop: 'gunga' } },
-  { id: 'fruittella', slug: 'fruittella', title: 'Fruittella', year: '2025', description: 'Graphic Design • Lettering', cover: { src: '/images/projects/pink.png', alt: 'Fruittella, lettering tridimensional vermelho sobre um fundo rosa.' } },
+  { id: 'chelsea', slug: 'chelsea-film-festival', title: 'Chelsea Film Festival', year: '2025', description: 'Graphic Design • Typography', cover: { src: '/images/projects/chelsea.png', alt: 'Chelsea Film Festival, white typography over a black and pink texture.' } },
+  { id: 'gunga-web', slug: 'ginga', title: 'Ginga', year: '2025', description: 'Creative Direction • Graphic Design', cover: { src: '/images/projects/gunga-web.png', alt: 'Ginga identity displayed on a television on a wooden cabinet.' } },
+  { id: 'nursegrid', slug: 'nursegrid', title: 'Nursegrid Recap', year: '2025', description: 'Graphic Design • 2025 Recap', cover: { src: '/images/projects/nursegrid.png', alt: 'Nursegrid 2025 recap, colorful geometric numbers on a blue background.', crop: 'nursegrid' } },
+  { id: 'gunga', slug: 'gunga', title: 'Gunga', year: '2025', description: 'Visual Identity • Graphic Design', cover: { src: '/images/projects/gunga.png', alt: 'Gunga identity, a circular typographic composition in pink, green and black.', crop: 'gunga' } },
+  { id: 'fruittella', slug: 'fruittella', title: 'Fruittella', year: '2025', description: 'Graphic Design • Lettering', cover: { src: '/images/projects/pink.png', alt: 'Fruittella, red three-dimensional lettering on a pink background.' } },
 ];
 
-const nursegridCover: CaseImage = { src: '/images/projects/nursegrid.png', alt: 'Nursegrid 2025 Recap, identidade em azul e números geométricos coloridos.' };
-const nursegridVertical: CaseImage = { src: '/images/projects/nursegrid-vertical.png', alt: 'Composição gráfica do Nursegrid Recap em roxo, azul e amarelo.' };
+const nursegridCover: CaseImage = { src: '/images/projects/nursegrid.png', alt: 'Nursegrid 2025 Recap, blue visual identity with colorful geometric numbers.' };
+const nursegridVertical: CaseImage = { src: '/images/projects/nursegrid-vertical.png', alt: 'Nursegrid Recap graphic composition in purple, blue and yellow.' };
 
 const nursegridCase: CaseStudy = {
   services: 'Art Direction, Campaign Visual Identity, Motion Graphics',

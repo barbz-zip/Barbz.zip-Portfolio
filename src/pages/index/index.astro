@@ -7,13 +7,13 @@ const projects = await getProjects();
 ---
 <Layout page="index" title="Index — barbz-zip">
   <main id="main" class="project-index" data-project-index>
-    <h1 class="sr-only">Index — projetos selecionados</h1>
-    <ul class="index-list" aria-label="Projetos selecionados">
+    <h1 class="sr-only">Index — selected projects</h1>
+    <ul class="index-list" aria-label="Selected projects">
       {projects.map(project => (
         <li>
           <a class="index-row" href={sitePath(`/${project.slug}/`)} data-index-project={project.id}>
             <span class="index-title">{project.title}</span>
-            <span class="index-year"><span class="sr-only">Ano: </span>{project.year}</span>
+            <span class="index-year"><span class="sr-only">Year: </span>{project.year}</span>
             <span class="index-attributes">{project.description.replaceAll(' • ', ' / ')}</span>
           </a>
         </li>
