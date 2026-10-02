@@ -1,0 +1,26 @@
+---
+import { sitePath } from '../../lib/paths';
+import Layout from '../../layouts/Layout.astro';
+import ProjectCover from '../../components/ProjectCover.astro';
+import { getProjects } from '../../data/projects';
+const projects = await getProjects();
+---
+<Layout page="index" title="Index — barbz-zip">
+  <main id="main" class="project-index" data-project-index>
+    <h1 class="sr-only">Index — projetos selecionados</h1>
+    <ul class="index-list" aria-label="Projetos selecionados">
+      {projects.map(project => (
+        <li>
+          <a class="index-row" href={sitePath(`/${project.slug}/`)} data-index-project={project.id}>
+            <span class="index-title">{project.title}</span>
+            <span class="index-year"><span class="sr-only">Ano: </span>{project.year}</span>
+            <span class="index-attributes">{project.description.replaceAll(' • ', ' / ')}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="index-preview" data-index-preview aria-hidden="true">
+      {projects.map(project => <div data-preview-project={project.id} hidden><ProjectCover cover={project.cover} /></div>)}
+    </div>
+  </main>
+</Layout>

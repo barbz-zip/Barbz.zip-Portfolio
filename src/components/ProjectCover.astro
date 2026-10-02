@@ -1,0 +1,7 @@
+---
+import { sitePath } from '../lib/paths';
+import type { ProjectPreview } from '../data/projects';
+interface Props { cover: ProjectPreview['cover'] }
+const { cover } = Astro.props;
+---
+<span class:list={['project-image', cover.crop]}><img src={sitePath(cover.src)} alt={cover.alt} width="320" height="213" draggable="false" decoding="async" /></span>

@@ -1,0 +1,29 @@
+---
+import { sitePath } from '../lib/paths';
+import Layout from '../layouts/Layout.astro';
+import { about } from '../data/about';
+---
+<Layout page="about" title="About — barbz-zip">
+  <main id="main" class="about-page">
+    <h1 class="sr-only">About — {about.name}</h1>
+    <figure class="about-profile">
+      <div class="about-portrait"><img src={sitePath(about.portrait)} alt={`Retrato de ${about.name}, vestindo uma jaqueta vermelha.`} fetchpriority="high" decoding="async" /></div>
+      <figcaption><span>{about.name}</span><br />{about.caption}</figcaption>
+    </figure>
+    <div class="about-content" lang="en">
+      <div class="about-biography">{about.biography.map(paragraph => <p>{paragraph}</p>)}</div>
+      <section class="about-recognitions" aria-labelledby="recognitions-title">
+        <h2 id="recognitions-title">Recognitions</h2>
+        <ul>
+          {about.recognitions.map(item => <li><span aria-hidden="true">{item.icon}</span> {item.href ? <a href={item.href} target="_blank" rel="noopener noreferrer">{item.title}</a> : item.title}</li>)}
+        </ul>
+      </section>
+      <section class="about-press" aria-labelledby="press-title">
+        <h2 id="press-title">Press</h2>
+        <ul>
+          {about.press.map(item => <li><span aria-hidden="true">↗</span> <a href={item.href} target="_blank" rel="noopener noreferrer">{item.title}</a>{item.continuation && <> <a href={item.continuation.href} target="_blank" rel="noopener noreferrer">{item.continuation.title}</a></>}</li>)}
+        </ul>
+      </section>
+    </div>
+  </main>
+</Layout>

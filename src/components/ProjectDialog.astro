@@ -1,0 +1,25 @@
+---
+import { sitePath } from '../lib/paths';
+import type { Project } from '../data/projects';
+interface Props { projects: Project[] }
+const { projects } = Astro.props;
+---
+<dialog class="project-dialog" data-project-dialog aria-labelledby="project-dialog-title" aria-describedby="project-dialog-description">
+  <article class="project-dialog-surface" tabindex="-1" autofocus>
+    <button class="project-dialog-close" type="button" data-project-close aria-label="Fechar projeto">fechar ×</button>
+    <div class="project-dialog-content" data-project-content></div>
+  </article>
+  <span class="case-cursor" data-case-cursor aria-hidden="true">open case study</span>
+</dialog>
+{projects.map(project => (
+  <template data-project-template={project.id}>
+    <a href={sitePath(`/${project.slug}/`)} class:list={['project-dialog-image', { 'project-dialog-image--ginga': project.id === 'gunga-web' }]} data-open-case aria-label={`Open case study: ${project.title}`}>
+      <img src={sitePath(project.cover.src)} alt={project.cover.alt} width="1054" height="592" decoding="async" />
+      <span class="case-touch-label" aria-hidden="true">open case study</span>
+    </a>
+    <div class="project-dialog-pills">
+      <h2 class="project-pill project-pill--title" id="project-dialog-title"><a href={sitePath(`/${project.slug}/`)}><span aria-hidden="true">↗</span> {project.title}</a></h2>
+      <p class="project-pill" id="project-dialog-description">{project.description}</p>
+    </div>
+  </template>
+))}

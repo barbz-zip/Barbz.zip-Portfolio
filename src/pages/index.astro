@@ -1,0 +1,7 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Gallery from '../components/Gallery.astro';
+import { getProjects } from '../data/projects';
+const projects = await getProjects();
+---
+<Layout page="home"><main id="main"><h1 class="sr-only">barbz.zip — projetos selecionados</h1><Gallery projects={projects} /></main></Layout>

@@ -1,0 +1,31 @@
+---
+import { sitePath } from '../lib/paths';
+import fontUrl from '../assets/abc-diatype-mono-trial.ttf?url';
+import Header from '../components/Header.astro';
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+interface Props { title?: string; page?: 'home' | 'index' | 'case' | 'about' }
+const { title = 'barbz.zip — graphic design and etc.', page = 'case' } = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="barbz.zip — graphic design and etc. Um arquivo de projetos de design gráfico." />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/png" href={sitePath('/images/zip.png')} />
+    <link rel="preload" href={fontUrl} as="font" type="font/ttf" crossorigin />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body class={`is-${page}`}>
+    <a class="skip-link" href="#main">Pular para o conteúdo</a>
+    <Header />
+    <slot />
+    {(page === 'home' || page === 'index') && <footer class="site-footer">graphic design and etc.</footer>}
+    <script>
+      import '../lib/site';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+---
+import { sitePath } from '../lib/paths';
+import Layout from '../layouts/Layout.astro';
+import { getProjects, type Project } from '../data/projects';
+export async function getStaticPaths() {
+  return (await getProjects()).map(project => ({ params: { slug: project.slug }, props: { project } }));
+}
+interface Props { project: Project }
+const { project } = Astro.props;
+const detail = project.caseStudy;
+---
+<Layout title={`${project.title} — barbz-zip`}>
+  <main id="main" class="case-study" data-case-study>
+    <button class="case-expand pill-button" type="button" data-expand-case aria-expanded="false" aria-controls="case-media" aria-label="Expandir imagens do projeto">
+      <img src={sitePath('/images/expand.svg')} width="10" height="10" alt="" />
+      <span data-expand-label>full screen</span>
+    </button>
+    <aside class="case-sidebar" data-case-sidebar aria-label="Informações do projeto">
+      <div class="case-heading">
+        <a href={sitePath('/')} class="case-back pill-button"><img src={sitePath('/images/back.svg')} width="9" height="9" alt="" />Back</a>
+        <div class="case-heading-copy">
+          <h1>{project.title}</h1>
+          <p>{detail.services}</p>
+          {project.year && <p>{project.year}</p>}
+        </div>
+      </div>
+      <div class="case-description">
+        <div class="case-description-copy">{detail.paragraphs.map(paragraph => <p>{paragraph}</p>)}</div>
+        <div class="case-meta">
+          <span>©2026</span>
+          <details class="case-credits">
+            <summary>Credits</summary>
+            <div class="case-credits-content">
+              {detail.credits.length ? detail.credits.map(credit => <p><strong>{credit.role}</strong><br />{credit.name}</p>) : <p>Credits coming soon.</p>}
+            </div>
+          </details>
+        </div>
+      </div>
+    </aside>
+    <div id="case-media" class="case-media" aria-label={`Imagens de ${project.title}`}>
+      {detail.gallery.map((row, rowIndex) => (
+        <div class:list={['case-media-row', `case-media-row--${row.layout}`, `case-media-row--${row.orientation}`]} data-row-key={row.key}>
+          {row.images.map(img => <figure><img src={sitePath(img.src)} alt={img.alt} loading={rowIndex === 0 ? 'eager' : 'lazy'} fetchpriority={rowIndex === 0 ? 'high' : 'auto'} decoding="async" /></figure>)}
+        </div>
+      ))}
+    </div>
+  </main>
+</Layout>

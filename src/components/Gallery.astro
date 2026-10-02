@@ -1,0 +1,16 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import ProjectDialog from './ProjectDialog.astro';
+import type { Project } from '../data/projects';
+interface Props { projects: Project[] }
+const { projects } = Astro.props;
+---
+<section class="gallery" aria-label="Projetos selecionados" aria-roledescription="carrossel" data-gallery>
+  <p class="sr-only" id="gallery-instructions">Arraste ou use a rolagem vertical ou horizontal para explorar. Use as setas do teclado para navegar e Enter para abrir o projeto central.</p>
+  <div class="gallery-viewport" tabindex="0" aria-label="Galeria de projetos" aria-describedby="gallery-instructions" data-viewport>
+    <div class="gallery-track" data-track>
+      <div class="gallery-group" data-group>{projects.map(project => <ProjectCard project={project} />)}</div>
+    </div>
+  </div>
+</section>
+<ProjectDialog projects={projects} />

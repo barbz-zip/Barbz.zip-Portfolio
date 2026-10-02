@@ -1,0 +1,19 @@
+---
+import { sitePath, localPath } from '../lib/paths';
+const items = ['read'];
+const isIndex = localPath(Astro.url.pathname).replace(/\/$/, '') === '/index';
+const isAbout = localPath(Astro.url.pathname).replace(/\/$/, '') === '/about';
+const isHome = localPath(Astro.url.pathname) === '/';
+---
+<header class="site-header">
+  <a href={sitePath('/')} class="zip-mark" aria-label="barbz.zip — início"><img src={sitePath('/images/zip.png')} width="34" height="34" alt="" /></a>
+  <nav class="menu" aria-label="Navegação principal">
+    <span class="menu-indicator" aria-hidden="true"></span>
+    <a class="menu-item" href={sitePath('/')} aria-current={isHome ? 'page' : undefined}>barbz.zip</a>
+    <a class="menu-item" href={sitePath('/index/')} aria-current={isIndex ? 'page' : undefined}>index</a>
+    <a class="menu-item" href={sitePath('/about/')} aria-current={isAbout ? 'page' : undefined}>about</a>
+    {items.map(label => <button class="menu-item" type="button" aria-disabled="true" title="Disponível em uma próxima etapa">{label}</button>)}
+    <button class="contact-button" type="button" aria-label="Contato — em breve" aria-disabled="true" title="Contato disponível em breve"><img src={sitePath('/images/message.svg')} width="24" height="24" alt="" /></button>
+  </nav>
+  <button class="contact-button contact-button--mobile" type="button" aria-label="Contato — em breve" aria-disabled="true" title="Contato disponível em breve"><img src={sitePath('/images/message-mobile.svg')} width="30" height="30" alt="" /></button>
+</header>
