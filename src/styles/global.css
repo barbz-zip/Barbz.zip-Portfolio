@@ -89,7 +89,7 @@ main { min-height: 100svh; position: relative; }
 .project-pill--title a { display: block; padding: 13px 20px; border-radius: inherit; transition: background 150ms ease; }
 .project-pill--title a:hover { background: #eee7df; }
 .project-dialog-image { cursor: pointer; }
-.case-cursor { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; font: 14px/1 'ABC Diatype Mono', monospace; white-space: nowrap; opacity: 0; transition: opacity 160ms; }
+.case-cursor { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; color: #fff; mix-blend-mode: difference; font: 14px/1 'ABC Diatype Mono', monospace; white-space: nowrap; opacity: 0; transition: opacity 160ms; }
 .case-cursor[data-visible] { opacity: 1; }
 .case-touch-label { display: none; position: absolute; bottom: 14px; left: 14px; font-size: 12px; }
 @media (hover: none) { .case-cursor { display: none; } .case-touch-label { display: block; } }
