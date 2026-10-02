@@ -9,7 +9,7 @@ interface Props { project: Project }
 const { project } = Astro.props;
 const detail = project.caseStudy;
 ---
-<Layout title={`${project.title} — barbz-zip`}>
+<Layout title={`barbz.${project.slug}.zip`}>
   <main id="main" class="case-study" data-case-study>
     <button class="case-expand pill-button" type="button" data-expand-case aria-expanded="false" aria-controls="case-media" aria-label="Expand project images">
       <img src={sitePath('/images/expand.svg')} width="10" height="10" alt="" />
