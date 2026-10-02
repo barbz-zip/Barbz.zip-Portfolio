@@ -6,6 +6,8 @@ import { initProjectIndex } from './project-index';
 import { prepareProjectReturn, rememberProjectReturn, restoreProjectReturn } from './project-return';
 
 let cleanups: Array<() => void> = [];
+let activeMenu: HTMLElement | null = null;
+let cleanupMenu: (() => void) | undefined;
 
 function cleanupPage() {
   cleanups.forEach(cleanup => cleanup());
@@ -19,7 +21,13 @@ document.addEventListener('astro:before-swap', event => {
 document.addEventListener('astro:after-swap', rememberProjectReturn);
 document.addEventListener('astro:page-load', () => {
   cleanupPage();
-  document.querySelectorAll<HTMLElement>('.menu').forEach(menu => cleanups.push(initMenu(menu)));
+  // The header persists across routes, including its indicator and listeners.
+  const menu = document.querySelector<HTMLElement>('.menu');
+  if (menu !== activeMenu) {
+    cleanupMenu?.();
+    activeMenu = menu;
+    cleanupMenu = menu ? initMenu(menu) : undefined;
+  }
   document.querySelectorAll<HTMLElement>('[data-gallery]').forEach(root => {
     const cleanup = initGallery(root);
     if (cleanup) cleanups.push(cleanup);

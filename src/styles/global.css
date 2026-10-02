@@ -38,9 +38,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible { background-color:
 .menu { position: absolute; top: var(--edge); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; border-radius: 60px; background: var(--menu-bg); white-space: nowrap; }
 .menu-item { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; height: 24px; padding: 3px 12px; border-radius: 24px; background: transparent; font-size: 14px; line-height: 1; font-weight: 400; transition: none; }
 .menu-item[aria-current='page'] { background: #fff; }
-.menu-indicator { position: absolute; top: 0; left: 0; border-radius: 24px; background: #fff; pointer-events: none; visibility: hidden; }
+.menu-indicator { position: absolute; top: 0; left: 0; border-radius: 24px; background: #fff; pointer-events: none; visibility: hidden; opacity: 0; }
 .menu[data-enhanced] .menu-indicator { visibility: visible; }
-.menu[data-animated] .menu-indicator { transition: transform 150ms ease, width 150ms ease; }
+.menu[data-animated] .menu-indicator { transition: transform 150ms ease, width 150ms ease, opacity 150ms ease; }
 .menu[data-enhanced] .menu-item { background: transparent; }
 .menu:not([data-enhanced]) .menu-item:hover { background: #fff; }
 [aria-disabled='true'] { cursor: default; }
@@ -162,6 +162,9 @@ main { min-height: 100svh; position: relative; }
 .about-press { width: min(256px, 100%); }
 ::view-transition-old(root) { animation: barbz-zip-page-out 220ms ease both; }
 ::view-transition-new(root) { animation: barbz-zip-page-in 360ms var(--ease) both; }
+::view-transition-group(barbz-zip-header) { z-index: 1; animation: none; }
+::view-transition-old(barbz-zip-header) { display: none; }
+::view-transition-new(barbz-zip-header) { animation: none; mix-blend-mode: normal; }
 @keyframes barbz-zip-page-out { to { opacity: 0; } }
 @keyframes barbz-zip-page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @media (min-width: 801px) and (max-width: 1200px) { .case-study { --sidebar-width: 34vw; } }

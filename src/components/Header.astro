@@ -5,7 +5,7 @@ const isIndex = localPath(Astro.url.pathname).replace(/\/$/, '') === '/index';
 const isAbout = localPath(Astro.url.pathname).replace(/\/$/, '') === '/about';
 const isHome = localPath(Astro.url.pathname) === '/';
 ---
-<header class="site-header">
+<header class="site-header" transition:persist="barbz-zip-header" transition:name="barbz-zip-header" transition:animate="none">
   <a href={sitePath('/')} class="zip-mark" aria-label="barbz.zip — home"><img src={sitePath('/images/zip.png')} width="34" height="34" alt="" /></a>
   <nav class="menu" aria-label="Main navigation">
     <span class="menu-indicator" aria-hidden="true"></span>
