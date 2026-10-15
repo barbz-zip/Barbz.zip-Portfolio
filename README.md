@@ -7,6 +7,7 @@ Projeto em Astro, TypeScript e CSS. Ambiente: Node.js 24 e pnpm 11.25.0.
 ```sh
 pnpm install
 pnpm dev
+pnpm dev:mobile # Prévia na rede local, porta 4322
 ```
 
 Servidor local: http://127.0.0.1:4321.
@@ -19,6 +20,7 @@ pnpm preview # Prévia local do build
 ```
 
 O arquivo `pnpm-lock.yaml` mantém as versões das dependências reproduzíveis.
+As prévias local e mobile e o build usam caches Vite separados para permitir execução simultânea.
 
 Para validar o build com o prefixo do GitHub Pages:
 
@@ -32,9 +34,14 @@ GITHUB_PAGES=true pnpm preview
 - `src/pages/`: rotas da home, index, about e páginas de projeto em `[slug].astro`.
 - `src/layouts/Layout.astro`: estrutura compartilhada, metadados, tipografia e navegação entre páginas.
 - `src/components/`: cabeçalho, galeria, capas, cards e diálogo dos projetos.
+- `src/components/PortfolioImage.astro`: variantes WebP responsivas e dimensões intrínsecas das imagens locais, geradas no build.
 - `src/data/`: conteúdo local e contrato dos projetos, acessado por `getProjects()`.
+- `src/components/BouncingWordmark.astro` e `src/lib/bouncing-wordmark.ts`: texto de fundo da home, movimento diagonal, colisões e tipografia dinâmica.
+- `src/data/home-fonts.mjs` e `src/data/home-typography.ts`: catálogo inicial de 160 URLs do Google Fonts e contrato para integração com o CMS.
+- `src/lib/wordmark-fonts.ts`: carregamento sob demanda com subconjunto de caracteres, preparação da próxima fonte e cache limitado.
 - `src/lib/gallery.ts`: slider infinito, autoplay de 50 px/s, drag e scroll; saída do hover e scroll sem espera adicional para retomar o autoplay.
 - `src/lib/gallery-math.ts`: normalização do loop e cálculo de cópias da galeria.
+- `src/pages/dump.astro` e `src/lib/dump.ts`: feed de imagens, profundidade na rolagem e descrição da imagem central; animação CSS nativa com alternativa JavaScript.
 - `src/lib/project-dialog.ts`: abertura e fechamento do pop-up e texto que acompanha o cursor.
 - `src/lib/project-index.ts`: interação da lista e prévia das capas junto ao cursor.
 - `src/lib/project-return.ts`: retorno à home ou ao index conforme a origem da navegação.

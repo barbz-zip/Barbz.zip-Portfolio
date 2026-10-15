@@ -1,4 +1,6 @@
 // barbz-zip: import schemaTypes into the future Sanity Studio configuration.
+import homeFonts from '../../src/data/home-fonts.mjs';
+import { googleFontFamily, validateFontLinks } from '../../src/lib/google-fonts.mjs';
 export function validateGalleryRow(value) {
   if (!value || !['single', 'pair'].includes(value.layout)) return 'Selecione uma ou duas imagens.';
   if (!['landscape', 'portrait', 'original'].includes(value.orientation)) return 'Selecione a orientação das imagens.';
@@ -45,4 +47,16 @@ export const project = {
   preview: { select: { title: 'title', media: 'cover', subtitle: 'description' } },
 };
 
-export const schemaTypes = [galleryRow, project];
+export const homeTypography = {
+  name: 'homeTypography', title: 'Home typography', type: 'document',
+  initialValue: { fonts: homeFonts },
+  fields: [{
+    name: 'fonts', title: 'Google Fonts links', type: 'array',
+    description: 'Add, remove or replace a font by pasting its Google Fonts specimen link. The animation chooses randomly on each viewport collision.',
+    of: [{ type: 'url', validation: rule => rule.required().custom(value => googleFontFamily(value) ? true : 'Enter a valid Google Fonts link for one font family.') }],
+    validation: rule => rule.required().custom(validateFontLinks),
+  }],
+  preview: { prepare: () => ({ title: 'Home typography', subtitle: 'Bouncing barbz.zip font collection' }) },
+};
+
+export const schemaTypes = [galleryRow, project, homeTypography];

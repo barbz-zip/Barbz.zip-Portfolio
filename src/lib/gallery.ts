@@ -25,6 +25,7 @@ export function initGallery(root: HTMLElement) {
   let lastX = 0;
   let lastPointerTime = 0;
   let frame = 0;
+  let resumeTimer = 0;
   let modalOpen = false;
   let startX = 0;
   let startY = 0;
@@ -64,9 +65,16 @@ export function initGallery(root: HTMLElement) {
     velocity = 0;
     root.dataset.enhanced = 'true';
     paint();
+    schedule();
+  }
+
+  function schedule() {
+    clearTimeout(resumeTimer);
+    if (!frame && !document.hidden) frame = requestAnimationFrame(animate);
   }
 
   function animate(time: number) {
+    frame = 0;
     const dt = Math.min((time - (lastTime || time)) / 1000, 0.05);
     lastTime = time;
     if (pointer === null && !modalOpen) {
@@ -84,7 +92,13 @@ export function initGallery(root: HTMLElement) {
       }
       paint();
     }
-    frame = requestAnimationFrame(animate);
+    const canAutoplay = pointer === null && !modalOpen && !reduced.matches && !hovering && !focused;
+    const settling = pointer === null && !modalOpen && (Math.abs(target - position) > .01 || Math.abs(velocity) > 1);
+    if (settling || (canAutoplay && time >= resumeAt)) schedule();
+    else {
+      lastTime = 0;
+      if (canAutoplay) resumeTimer = window.setTimeout(schedule, Math.max(0, resumeAt - time));
+    }
   }
 
   viewport.addEventListener('pointerdown', event => {
@@ -133,6 +147,7 @@ export function initGallery(root: HTMLElement) {
     delete root.dataset.dragging;
     resumeAt = performance.now() + RESUME_DELAY;
     if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
+    schedule();
   }
   window.addEventListener('pointerup', release, { signal });
   window.addEventListener('pointercancel', release, { signal });
@@ -150,6 +165,7 @@ export function initGallery(root: HTMLElement) {
     focused = false;
     hovering = canHover.matches && Boolean(root.querySelector('.project-image:hover'));
     resumeAt = performance.now() + RESUME_DELAY;
+    schedule();
   }, { signal });
   window.addEventListener('wheel', event => {
     if (modalOpen || event.ctrlKey || event.metaKey || event.defaultPrevented || pointer !== null) return;
@@ -161,6 +177,7 @@ export function initGallery(root: HTMLElement) {
     target += (horizontal ? event.deltaX : event.deltaY) * scale;
     velocity = 0;
     resumeAt = 0;
+    schedule();
   }, { passive: false, signal });
   document.addEventListener('pointermove', event => {
     if (event.pointerType !== 'mouse') return;
@@ -169,10 +186,11 @@ export function initGallery(root: HTMLElement) {
     const overImage = Boolean(image && root.contains(image));
     if (hovering && !overImage) resumeAt = 0;
     hovering = overImage;
+    schedule();
   }, { signal });
-  viewport.addEventListener('pointerleave', () => { hovering = false; resumeAt = 0; }, { signal });
+  viewport.addEventListener('pointerleave', () => { hovering = false; resumeAt = 0; schedule(); }, { signal });
   viewport.addEventListener('focus', () => focused = viewport.matches(':focus-visible'), { signal });
-  viewport.addEventListener('blur', () => { focused = false; resumeAt = 0; }, { signal });
+  viewport.addEventListener('blur', () => { focused = false; resumeAt = 0; schedule(); }, { signal });
   viewport.addEventListener('keydown', event => {
     focused = true;
     if (event.target === viewport && (event.key === 'Enter' || event.key === ' ')) {
@@ -195,16 +213,18 @@ export function initGallery(root: HTMLElement) {
     else target += event.key === 'ArrowRight' ? step : -step;
     velocity = 0;
     resumeAt = performance.now() + RESUME_DELAY;
+    schedule();
   }, { signal });
-  reduced.addEventListener('change', () => { velocity = 0; }, { signal });
+  reduced.addEventListener('change', () => { velocity = 0; schedule(); }, { signal });
   document.addEventListener('visibilitychange', () => {
     cancelAnimationFrame(frame);
+    clearTimeout(resumeTimer);
+    frame = 0;
     lastTime = 0;
-    if (!document.hidden) frame = requestAnimationFrame(animate);
+    schedule();
   }, { signal });
   const observer = new ResizeObserver(measure);
   observer.observe(viewport);
   measure();
-  frame = requestAnimationFrame(animate);
-  return () => { controller.abort(); observer.disconnect(); cancelAnimationFrame(frame); };
+  return () => { controller.abort(); observer.disconnect(); cancelAnimationFrame(frame); clearTimeout(resumeTimer); };
 }

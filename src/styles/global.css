@@ -35,6 +35,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible { background-color:
 .zip-mark { position: absolute; left: var(--edge); top: var(--edge); width: 34px; height: 34px; transition: transform 400ms var(--ease); }
 .zip-mark:hover { transform: rotate(-8deg) translateY(-2px); }
 .zip-mark img { display: block; width: 34px; height: 34px; object-fit: cover; }
+.zip-mark-dark, .zip-label, .contact-button .contact-icon-dark { display: none; }
 .menu { position: absolute; top: var(--edge); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; border-radius: 60px; background: var(--menu-bg); white-space: nowrap; }
 .menu-item { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; height: 24px; padding: 3px 12px; border-radius: 24px; background: transparent; font-size: 14px; line-height: 1; font-weight: 400; transition: none; }
 .menu-item[aria-current='page'] { background: #fff; }
@@ -48,6 +49,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible { background-color:
 .contact-button img { display: block; }
 .contact-button--mobile { display: none; }
 main { min-height: 100svh; position: relative; }
+.wordmark-stage { position: fixed; inset: 0; overflow: hidden; pointer-events: none; user-select: none; z-index: -1; }
+.is-home main { isolation: isolate; }
+.bouncing-wordmark { position: absolute; top: 0; left: 0; overflow: visible; font: 400 clamp(42px, 6.614vw, 100px)/1 'ABC Diatype Mono', monospace; fill: var(--menu-bg); will-change: transform; }
 .gallery { position: absolute; top: calc(50% - 9.5px); width: 100%; transform: translateY(-50%); }
 .gallery-viewport { width: 100%; overflow-x: auto; overflow-y: hidden; padding: 16px 0 40px; margin-bottom: -24px; scrollbar-width: none; overscroll-behavior-x: contain; outline-offset: -5px !important; }
 .gallery-viewport::-webkit-scrollbar { display: none; }
@@ -160,6 +164,70 @@ main { min-height: 100svh; position: relative; }
 .about-content a:hover { opacity: .6; }
 .about-recognitions { width: min(314px, 100%); }
 .about-press { width: min(256px, 100%); }
+html:has(body.is-dump), body.is-dump { background: #000; color: #e6e6e6; color-scheme: dark; }
+.is-dump { --menu-bg: #363636; }
+.is-dump .site-header { position: fixed; pointer-events: none; }
+.is-dump .site-header .menu, .is-dump .site-header .zip-mark { pointer-events: auto; }
+.is-dump .menu-indicator, .is-dump .menu-item[aria-current='page'] { background: #f8f3ee; }
+.is-dump .menu[data-enhanced] .menu-item { background: transparent; }
+.is-dump .menu-item[data-indicated], .is-dump .menu:not([data-enhanced]) .menu-item[aria-current='page'] { color: #000; }
+.is-dump .zip-mark-light, .is-dump .contact-button .contact-icon-light { display: none; }
+.is-dump .zip-mark-dark { display: block; position: relative; width: 34px; height: 34px; overflow: hidden; border-radius: 3px; }
+.is-dump .zip-mark-dark img { position: absolute; width: 185.41%; height: 214.24%; left: -43.78%; top: -52.11%; max-width: none; }
+.is-dump .contact-button .contact-icon-dark { display: block; }
+.is-dump .zip-label { display: flex; align-items: center; justify-content: center; position: absolute; top: -10px; left: 17px; width: 46px; height: 19px; border-radius: 24px; background: #363636; font-size: 14px; line-height: 1; font-weight: 300; }
+.is-dump .skip-link { color: #000; }
+.is-dump a:focus-visible, .is-dump button:focus-visible { color: #000; }
+.dump-page { overflow: clip; }
+.dump-viewport-metric { position: fixed; height: 100svh; width: 0; visibility: hidden; pointer-events: none; }
+.dump-wordmark { position: fixed; top: 50svh; left: calc(50% + .025vw); width: 1454.16px; height: 384.34px; transform: translate(-50%, -50%) scale(var(--wordmark-scale, 1)); transform-origin: center; user-select: none; }
+.dump-wordmark img { display: block; }
+.dump-pixels { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.dump-wordmark[data-pixelated] img { visibility: hidden; }
+.dump-wordmark[data-pixelated] .dump-pixels { display: block; }
+.dump-feed { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 73.62svh 24px 50svh; pointer-events: none; }
+.dump-item { margin: 0; width: min(var(--image-width), calc(100% / 1.12)); aspect-ratio: var(--image-ratio); flex-shrink: 0; }
+.dump-image { position: relative; width: 100%; height: 100%; overflow: hidden; transform-origin: center; pointer-events: auto; }
+.dump-item[data-near-viewport] .dump-image { will-change: transform; }
+@supports (animation-timeline: view()) and (view-timeline-name: --dump-image) {
+  @media (prefers-reduced-motion: no-preference) {
+    .dump-item { view-timeline-inset: 0 calc(100% - 100svh); }
+    .dump-image {
+      animation: barbz-zip-dump-depth 1s cubic-bezier(.333333, 0, .666667, 1) both;
+      animation-timeline: var(--image-timeline);
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+@keyframes barbz-zip-dump-depth {
+  0%, 100% { transform: scale(.55); filter: brightness(.35); }
+  50% { transform: scale(1.12); filter: brightness(1); }
+}
+.dump-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.dump-item--carton img { position: absolute; width: 170.97%; height: 104.48%; left: -37.78%; top: 0; }
+.dump-item--trifold img { position: absolute; width: 100.77%; height: 100%; left: -.27%; top: 0; }
+.dump-item--photograph img { position: absolute; width: 104.55%; height: 140.42%; left: -1.88%; top: -4.59%; }
+.dump-grid { position: fixed; top: 25px; right: 26px; z-index: 10; }
+.dump-cursor { z-index: 30; }
+.dump-description { position: fixed; left: 20px; bottom: max(28px, env(safe-area-inset-bottom)); z-index: 25; width: min(264px, calc(100vw - 40px)); height: 34px; color: #e6e6e6; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(8px); transition: opacity 180ms ease, transform 240ms var(--ease), visibility 180ms; }
+.dump-description[data-visible] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+.dump-description-toggle { gap: 6px; height: 34px; transition: opacity 140ms ease, visibility 140ms; }
+.dump-description-toggle img { display: block; }
+.dump-description-panel { position: absolute; bottom: 0; left: 0; width: 100%; max-height: calc(100svh - 150px); overflow-y: auto; overscroll-behavior: contain; padding: 20px 24px; border-radius: 18px; background: #363636; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(12px) scale(.94); transform-origin: bottom left; transition: opacity 180ms ease, transform 300ms var(--ease), visibility 180ms; }
+.dump-description-panel h2 { margin: 0 0 20px; padding-right: 12px; font-size: 14px; line-height: 17px; font-weight: 700; overflow-wrap: anywhere; }
+.dump-description-panel p { margin: 0; font-size: 14px; line-height: 17px; font-weight: 400; overflow-wrap: anywhere; }
+.dump-description-close { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: transparent; font-size: 20px; line-height: 1; cursor: pointer; }
+.dump-description-close:hover { background: #ffffff14; }
+.dump-description[data-open] .dump-description-panel { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0) scale(1); }
+.dump-description[data-open] .dump-description-toggle { opacity: 0; visibility: hidden; pointer-events: none; }
+@media (max-width: 800px) {
+  .is-home .site-header .zip-mark, .is-dump .site-header .zip-mark { display: block; left: 12px; top: 78px; pointer-events: auto; }
+  .is-dump .contact-button--mobile { display: none; }
+  .dump-grid { top: 78px; right: 12px; }
+  .dump-feed { padding-inline: 16px; }
+  .dump-item--carton { width: min(348px, 58vw); }
+  .dump-description { left: 12px; bottom: max(20px, env(safe-area-inset-bottom)); width: min(264px, calc(100vw - 24px)); }
+}
 ::view-transition-old(root) { animation: barbz-zip-page-out 220ms ease both; }
 ::view-transition-new(root) { animation: barbz-zip-page-in 360ms var(--ease) both; }
 ::view-transition-group(barbz-zip-header) { z-index: 1; animation: none; }

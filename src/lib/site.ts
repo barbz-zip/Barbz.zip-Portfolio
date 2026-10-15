@@ -1,4 +1,6 @@
 import { initGallery } from './gallery';
+import { initBouncingWordmark } from './bouncing-wordmark';
+import { initDump } from './dump';
 import { initProjectDialog } from './project-dialog';
 import { initCaseStudy } from './case-study';
 import { initMenu } from './menu';
@@ -32,6 +34,7 @@ document.addEventListener('astro:page-load', () => {
     const cleanup = initGallery(root);
     if (cleanup) cleanups.push(cleanup);
   });
+  document.querySelectorAll<HTMLElement>('[data-wordmark-stage]').forEach(stage => cleanups.push(initBouncingWordmark(stage)));
   if (document.querySelector('[data-project-dialog]')) cleanups.push(initProjectDialog());
   const page = document.querySelector<HTMLElement>('[data-case-study]');
   if (page) {
@@ -40,4 +43,6 @@ document.addEventListener('astro:page-load', () => {
   }
   const index = document.querySelector<HTMLElement>('[data-project-index]');
   if (index) cleanups.push(initProjectIndex(index));
+  const dump = document.querySelector<HTMLElement>('[data-dump]');
+  if (dump) cleanups.push(initDump(dump));
 });

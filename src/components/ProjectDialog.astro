@@ -1,5 +1,6 @@
 ---
 import { sitePath } from '../lib/paths';
+import PortfolioImage from './PortfolioImage.astro';
 import type { Project } from '../data/projects';
 interface Props { projects: Project[] }
 const { projects } = Astro.props;
@@ -14,7 +15,7 @@ const { projects } = Astro.props;
 {projects.map(project => (
   <template data-project-template={project.id}>
     <a href={sitePath(`/${project.slug}/`)} class:list={['project-dialog-image', { 'project-dialog-image--ginga': project.id === 'gunga-web' }]} data-open-case aria-label={`Open case study: ${project.title}`}>
-      <img src={sitePath(project.cover.src)} alt={project.cover.alt} width="1054" height="592" decoding="async" />
+      <PortfolioImage src={project.cover.src} alt={project.cover.alt} widths={[640, 1080, 1600, 2160]} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 95vw, 1054px" />
       <span class="case-touch-label" aria-hidden="true">open case study</span>
     </a>
     <div class="project-dialog-pills">

@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DumpDescription from '../components/DumpDescription.astro';
+import { dumpImages } from '../data/dump';
+import { sitePath } from '../lib/paths';
+import { Image } from 'astro:assets';
+import carton from '../../public/images/dump/carton.png';
+import trifold from '../../public/images/dump/trifold.png';
+import photograph from '../../public/images/dump/photograph.png';
+import truck from '../../public/images/dump/truck.png';
+const sources = { carton, trifold, photograph, truck };
+const previewImages = [...dumpImages, ...dumpImages];
+---
+<Layout page="dump" title="barbz.dump.zip">
+  <main id="main" class="dump-page" data-dump>
+    <div class="dump-viewport-metric" aria-hidden="true"></div>
+    <h1 class="sr-only">barbz.zip — dump</h1>
+    <div class="dump-wordmark" data-pixel-wordmark aria-hidden="true">
+      <img src={sitePath('/images/dump/wordmark.svg')} alt="" draggable="false" />
+      <svg class="dump-pixels" viewBox="0 0 1454.16 384.34" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="dump-feed">
+      {previewImages.map((item, index) => (
+        <figure class={`dump-item dump-item--${item.id}`} style={`--image-width: ${item.width}px; --image-ratio: ${item.width} / ${item.height}; view-timeline-name: --dump-image-${index}; --image-timeline: --dump-image-${index}`} data-dump-item>
+          <div class="dump-image" data-dump-image>
+            <Image src={sources[item.id as keyof typeof sources]} alt={item.alt}
+              widths={[400, 800, 1200, 1600].filter(width => width <= sources[item.id as keyof typeof sources].width)}
+              sizes={`(max-width: 800px) ${item.id === 'carton' ? '112vw' : '100vw'}, ${Math.ceil(item.width * 1.12 * (item.id === 'carton' ? 1.71 : 1.05))}px`}
+              format="webp" quality={85} loading={index < 2 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} decoding="async" draggable="false" />
+          </div>
+        </figure>
+      ))}
+    </div>
+    <DumpDescription images={previewImages} />
+  </main>
+  <button class="pill-button dump-grid" type="button" aria-disabled="true" title="Coming soon">Grid View</button>
+  <span class="case-cursor dump-cursor" data-dump-cursor aria-hidden="true">scroll</span>
+</Layout>

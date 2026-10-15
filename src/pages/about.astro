@@ -1,5 +1,5 @@
 ---
-import { sitePath } from '../lib/paths';
+import PortfolioImage from '../components/PortfolioImage.astro';
 import Layout from '../layouts/Layout.astro';
 import { about } from '../data/about';
 ---
@@ -7,7 +7,7 @@ import { about } from '../data/about';
   <main id="main" class="about-page">
     <h1 class="sr-only">About — {about.name}</h1>
     <figure class="about-profile">
-      <div class="about-portrait"><img src={sitePath(about.portrait)} alt={`Portrait of ${about.name} wearing a red jacket.`} fetchpriority="high" decoding="async" /></div>
+      <div class="about-portrait"><PortfolioImage src={about.portrait} alt={`Portrait of ${about.name} wearing a red jacket.`} widths={[400, 800, 1200]} sizes="(max-width: 800px) 100vw, 392px" fetchpriority="high" /></div>
       <figcaption><span>{about.name}</span><br />{about.caption}</figcaption>
     </figure>
     <div class="about-content" lang="en">

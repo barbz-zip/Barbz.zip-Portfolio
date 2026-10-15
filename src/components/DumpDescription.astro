@@ -1,0 +1,17 @@
+---
+import { sitePath } from '../lib/paths';
+interface Props { images: Array<{ title: string; description: string }> }
+const { images } = Astro.props;
+---
+<aside class="dump-description" data-dump-description data-descriptions={JSON.stringify(images.map(({ title, description }) => ({ title, description })))} aria-label="Image description" aria-hidden="true" inert>
+  <button class="pill-button dump-description-toggle" type="button" data-description-toggle aria-expanded="false" aria-controls="dump-description-panel">
+    Description <img src={sitePath('/images/dump/description-arrow.svg')} alt="" />
+  </button>
+  <section class="dump-description-panel" id="dump-description-panel" data-description-panel aria-labelledby="dump-description-title" aria-hidden="true" inert>
+    <button class="dump-description-close" type="button" data-description-close aria-label="Close description">×</button>
+    <div data-description-copy aria-live="polite" aria-atomic="true">
+      <h2 id="dump-description-title" data-description-title></h2>
+      <p data-description-text></p>
+    </div>
+  </section>
+</aside>

@@ -1,6 +1,7 @@
 ---
 import { sitePath } from '../lib/paths';
 import Layout from '../layouts/Layout.astro';
+import PortfolioImage from '../components/PortfolioImage.astro';
 import { getProjects, type Project } from '../data/projects';
 export async function getStaticPaths() {
   return (await getProjects()).map(project => ({ params: { slug: project.slug }, props: { project } }));
@@ -40,7 +41,7 @@ const detail = project.caseStudy;
     <div id="case-media" class="case-media" aria-label={`Images for ${project.title}`}>
       {detail.gallery.map((row, rowIndex) => (
         <div class:list={['case-media-row', `case-media-row--${row.layout}`, `case-media-row--${row.orientation}`]} data-row-key={row.key}>
-          {row.images.map(img => <figure><img src={sitePath(img.src)} alt={img.alt} loading={rowIndex === 0 ? 'eager' : 'lazy'} fetchpriority={rowIndex === 0 ? 'high' : 'auto'} decoding="async" /></figure>)}
+          {row.images.map(img => <figure><PortfolioImage src={img.src} alt={img.alt} widths={[480, 800, 1200, 1600, 2400]} sizes={row.layout === 'pair' ? '50vw' : '100vw'} loading={rowIndex === 0 ? 'eager' : 'lazy'} fetchpriority={rowIndex === 0 ? 'high' : 'auto'} /></figure>)}
         </div>
       ))}
     </div>

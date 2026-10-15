@@ -1,0 +1,16 @@
+---
+import type { HomeTypography } from '../data/home-typography';
+interface Props { typography: HomeTypography }
+const { typography } = Astro.props;
+---
+<div class="wordmark-stage" data-wordmark-stage data-fonts={JSON.stringify(typography.fonts)} aria-hidden="true">
+  <svg class="bouncing-wordmark" data-wordmark width="534" height="100" xmlns="http://www.w3.org/2000/svg" focusable="false">
+    <defs>
+      <filter id="barbz-zip-wordmark-color" x="-20%" y="-50%" width="140%" height="200%" color-interpolation-filters="sRGB">
+        <feFlood flood-color="#f8f3ee" />
+        <feComposite in2="SourceAlpha" operator="in" />
+      </filter>
+    </defs>
+    <text data-wordmark-text x="0" y="80" filter="url(#barbz-zip-wordmark-color)">barbz.zip</text>
+  </svg>
+</div>

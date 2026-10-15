@@ -1,3 +1,5 @@
+import { localPath, sitePath } from './paths';
+
 export function initMenu(menu: HTMLElement) {
   const controller = new AbortController();
   const { signal } = controller;
@@ -11,6 +13,7 @@ export function initMenu(menu: HTMLElement) {
 
   function positionIndicator() {
     const item = navigation ? pending : hovered ?? focused ?? current;
+    items.forEach(candidate => candidate.toggleAttribute('data-indicated', candidate === item));
     indicator.style.opacity = item ? '1' : '0';
     if (!item) return;
     indicator.style.width = `${item.offsetWidth}px`;
@@ -50,6 +53,12 @@ export function initMenu(menu: HTMLElement) {
     navigation = null;
     pending = hovered = focused = null;
     current = itemForPath(location.pathname);
+    const zip = menu.closest('header')?.querySelector<HTMLAnchorElement>('.zip-mark');
+    if (zip) {
+      const isDump = localPath(location.pathname).replace(/\/$/, '') === '/dump';
+      zip.href = sitePath(isDump ? '/' : '/dump/');
+      zip.setAttribute('aria-label', isDump ? 'barbz.zip — home' : 'barbz.zip — dump');
+    }
     items.forEach(item => {
       if (item === current) item.setAttribute('aria-current', 'page');
       else item.removeAttribute('aria-current');
