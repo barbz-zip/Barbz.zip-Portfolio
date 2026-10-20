@@ -182,6 +182,7 @@ html:has(body.is-dump), body.is-dump { background: #000; color: #e6e6e6; color-s
 .dump-viewport-metric { position: fixed; height: 100svh; width: 0; visibility: hidden; pointer-events: none; }
 .dump-wordmark { position: fixed; top: 50svh; left: calc(50% + .025vw); width: 1454.16px; height: 384.34px; transform: translate(-50%, -50%) scale(var(--wordmark-scale, 1)); transform-origin: center; user-select: none; }
 .dump-wordmark img { display: block; }
+.dump-page[data-grid] .dump-wordmark { display: none; }
 .dump-pixels { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .dump-wordmark[data-pixelated] img { visibility: hidden; }
 .dump-wordmark[data-pixelated] .dump-pixels { display: block; }
@@ -208,6 +209,22 @@ html:has(body.is-dump), body.is-dump { background: #000; color: #e6e6e6; color-s
 .dump-item--trifold img { position: absolute; width: 100.77%; height: 100%; left: -.27%; top: 0; }
 .dump-item--photograph img { position: absolute; width: 104.55%; height: 140.42%; left: -1.88%; top: -4.59%; }
 .dump-grid { position: fixed; top: 25px; right: 26px; z-index: 10; }
+.dump-page[data-grid] .dump-feed { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; gap: 10px; padding: 116px 24px 40px; }
+.dump-page[data-grid] .dump-item { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1; min-width: 0; view-timeline-name: none !important; }
+.dump-page[data-grid] .dump-image { width: min(100%, calc(100% * var(--image-ratio))); height: auto; aspect-ratio: var(--image-ratio); animation: none; transform: none; filter: none; will-change: auto; }
+.dump-grid[aria-pressed='true'] { background: #f8f3ee; color: #000; }
+.dump-grid-open { display: none; }
+.dump-page[data-grid] .dump-grid-open { display: block; position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; background: transparent; cursor: pointer; pointer-events: auto; }
+.dump-page[data-grid] .dump-grid-open:focus-visible { box-shadow: inset 0 0 0 2px #f8f3ee; border-radius: 4px; }
+.dump-lightbox-open { overflow: hidden; }
+.dump-lightbox { position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: none; margin: 0; border: 0; padding: 70px 24px; background: transparent; color: #e6e6e6; overflow: hidden; overscroll-behavior: contain; }
+.dump-lightbox[open] { display: grid; place-items: center; }
+.dump-lightbox::backdrop { background: rgb(0 0 0 / 25%); }
+.dump-lightbox-media { position: relative; margin: 0; width: min(960px, 100%, calc((100svh - 140px) * var(--image-ratio))); aspect-ratio: var(--image-ratio); opacity: 0; transform: translateY(12px); transition: opacity 180ms ease, transform 260ms var(--ease); }
+.dump-page[data-grid] .dump-lightbox-media .dump-image { width: 100%; height: 100%; aspect-ratio: auto; }
+.dump-lightbox[data-visible] .dump-lightbox-media { opacity: 1; transform: translateY(0); }
+.dump-lightbox-close { position: absolute; top: 25px; right: 26px; min-width: 126px; }
+.dump-lightbox .dump-description { z-index: 1; }
 .dump-cursor { z-index: 30; }
 .dump-description { position: fixed; left: 20px; bottom: max(28px, env(safe-area-inset-bottom)); z-index: 25; width: min(264px, calc(100vw - 40px)); height: 34px; color: #e6e6e6; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(8px); transition: opacity 180ms ease, transform 240ms var(--ease), visibility 180ms; }
 .dump-description[data-visible] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
@@ -225,6 +242,10 @@ html:has(body.is-dump), body.is-dump { background: #000; color: #e6e6e6; color-s
   .is-dump .contact-button--mobile { display: none; }
   .dump-grid { top: 78px; right: 12px; }
   .dump-feed { padding-inline: 16px; }
+  .dump-page[data-grid] .dump-feed { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 138px 16px 32px; }
+  .dump-lightbox { padding-inline: 16px; }
+  .dump-lightbox-close { top: 78px; right: 12px; }
+  .dump-lightbox .dump-description-panel { max-height: min(300px, 38svh); }
   .dump-item--carton { width: min(348px, 58vw); }
   .dump-description { left: 12px; bottom: max(20px, env(safe-area-inset-bottom)); width: min(264px, calc(100vw - 24px)); }
 }

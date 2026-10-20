@@ -4,11 +4,13 @@ import { initDump } from '../src/lib/dump.ts';
 
 function setup(t: TestContext, native = false) {
   const window = Object.assign(new EventTarget(), { scrollY: 0 });
+  Object.assign(window, { scrollTo: ({ top }: { top: number }) => { window.scrollY = top; } });
   const html = Object.assign(new EventTarget(), { clientWidth: 390, scrollHeight: 3000 });
   const reduced = Object.assign(new EventTarget(), { matches: false });
   const source = new EventTarget();
   const overlay = { replaceChildren() {} };
   const wordmark = Object.assign(new EventTarget(), {
+    style: { opacity: '', visibility: '' },
     dataset: {}, toggleAttribute() {}, querySelector: (selector: string) => selector === 'img' ? source : overlay,
   });
   const image = { style: { transform: '', filter: '' } };
@@ -18,10 +20,16 @@ function setup(t: TestContext, native = false) {
     getBoundingClientRect: () => { layoutReads++; return { top: 600 - window.scrollY, height: 460 }; },
   };
   const cursor = { dataset: {} };
-  const document = Object.assign(new EventTarget(), { documentElement: html, querySelector: () => cursor });
+  const gridAttributes = new Map<string, string>();
+  const gridButton = Object.assign(new EventTarget(), { textContent: 'Grid View', setAttribute: (name: string, value: string) => gridAttributes.set(name, value) });
+  let grid = false;
+  let transitions = 0;
+  const feed = { animate: () => { transitions++; return { cancel() {} }; } };
+  const document = Object.assign(new EventTarget(), { documentElement: html, querySelector: (selector: string) => selector === '[data-dump-grid]' ? gridButton : cursor });
   const page = {
     style: { setProperty() {} },
-    querySelector: (selector: string) => selector === '[data-dump-description]' ? null : selector === '[data-pixel-wordmark]' ? wordmark : { getBoundingClientRect: () => ({ height: 844 }) },
+    toggleAttribute: (_name: string, value: boolean) => { grid = value; },
+    querySelector: (selector: string) => selector === '.dump-feed' ? feed : ['[data-dump-description]', '[data-dump-lightbox]'].includes(selector) ? null : selector === '[data-pixel-wordmark]' ? wordmark : { getBoundingClientRect: () => ({ height: 844 }) },
     querySelectorAll: () => [item],
   };
   let serial = 0;
@@ -54,7 +62,7 @@ function setup(t: TestContext, native = false) {
     callbacks.forEach(callback => callback(time));
   }
   function settle() { for (let count = 0; frames.size && count < 100; count++) tick(); }
-  return { window, html, image, frames, reduced, tick, settle, reads: () => layoutReads };
+  return { window, html, image, wordmark, frames, reduced, tick, settle, reads: () => layoutReads, gridButton, gridAttributes, grid: () => grid, transitions: () => transitions };
 }
 
 test('fallback scroll does not measure layout or jump when the Safari toolbar resizes', t => {
@@ -89,7 +97,59 @@ test('native timeline does not run a competing JavaScript scroll animation', t =
   const s = setup(t, true);
   s.window.scrollY = 300;
   s.window.dispatchEvent(new Event('scroll'));
+  s.tick();
   assert.equal(s.frames.size, 0);
   assert.equal(s.image.style.transform, '');
   assert.equal(s.image.style.filter, '');
+});
+
+for (const native of [false, true]) {
+  test(`wordmark fades until the first image is centered with ${native ? 'native' : 'fallback'} motion`, t => {
+    const s = setup(t, native);
+    s.settle();
+    const reads = s.reads();
+    assert.equal(s.wordmark.style.opacity, '1');
+    // First image center: 600 + 460 / 2; viewport center: 844 / 2.
+    for (const [scroll, opacity] of [[204, .5], [408, 0], [800, 0], [0, 1]]) {
+      s.window.scrollY = scroll;
+      s.window.dispatchEvent(new Event('scroll'));
+      s.settle();
+      assert.equal(Number(s.wordmark.style.opacity), opacity);
+      assert.equal(s.wordmark.style.visibility, opacity === 0 ? 'hidden' : '');
+    }
+    assert.equal(s.reads(), reads, 'fade uses cached geometry without layout reads');
+  });
+
+  test(`grid toggles and restores stream position with ${native ? 'native' : 'fallback'} motion`, t => {
+    const s = setup(t, native);
+    s.window.scrollY = 800;
+    s.window.dispatchEvent(new Event('scroll'));
+    s.settle();
+    s.gridButton.dispatchEvent(new Event('click'));
+    assert.equal(s.grid(), true);
+    assert.equal(s.gridAttributes.get('aria-pressed'), 'true');
+    assert.equal(s.gridButton.textContent, 'Scroll View');
+    assert.equal(s.window.scrollY, 0);
+    assert.equal(s.image.style.transform, '');
+    assert.equal(s.image.style.filter, '');
+    s.window.scrollY = 120;
+    s.window.dispatchEvent(new Event('scroll'));
+    assert.equal(s.frames.size, 0, 'no depth animation loop in grid view');
+    s.gridButton.dispatchEvent(new Event('click'));
+    s.settle();
+    assert.equal(s.grid(), false);
+    assert.equal(s.gridAttributes.get('aria-pressed'), 'false');
+    assert.equal(s.gridButton.textContent, 'Grid View');
+    assert.equal(s.window.scrollY, 800);
+    assert.equal(s.transitions(), 2);
+    if (!native) assert.match(s.image.style.transform, /^scale\(/);
+  });
+}
+
+test('grid switches without an entrance animation when reduced motion is enabled', t => {
+  const s = setup(t);
+  s.reduced.matches = true;
+  s.gridButton.dispatchEvent(new Event('click'));
+  assert.equal(s.grid(), true);
+  assert.equal(s.transitions(), 0);
 });

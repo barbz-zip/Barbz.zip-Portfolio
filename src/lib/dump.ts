@@ -1,6 +1,7 @@
 import { dumpImagePresence } from './dump-motion.ts';
 import { initPixelWordmark } from './pixel-wordmark.ts';
 import { initDumpDescription } from './dump-description.ts';
+import { initDumpLightbox } from './dump-lightbox.ts';
 
 export function initDump(page: HTMLElement) {
   const controller = new AbortController();
@@ -8,8 +9,12 @@ export function initDump(page: HTMLElement) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const descriptionRoot = page.querySelector<HTMLElement>('[data-dump-description]');
   const description = descriptionRoot ? initDumpDescription(descriptionRoot) : null;
-  const cleanupWordmark = initPixelWordmark(page.querySelector<HTMLElement>('[data-pixel-wordmark]')!);
+  const cleanupLightbox = initDumpLightbox(page);
+  const wordmark = page.querySelector<HTMLElement>('[data-pixel-wordmark]')!;
+  const cleanupWordmark = initPixelWordmark(wordmark);
   const cursor = document.querySelector<HTMLElement>('[data-dump-cursor]')!;
+  const gridButton = document.querySelector<HTMLButtonElement>('[data-dump-grid]');
+  const feed = page.querySelector<HTMLElement>('.dump-feed');
   const nativeTimeline = CSS.supports('animation-timeline: view()') && CSS.supports('view-timeline-name: --dump-image');
   const viewportMetric = page.querySelector<HTMLElement>('.dump-viewport-metric')!;
   const items = [...page.querySelectorAll<HTMLElement>('[data-dump-item]')].map(item => ({
@@ -22,6 +27,9 @@ export function initDump(page: HTMLElement) {
   let viewportHeight = 0;
   let viewportWidth = 0;
   let maxScroll = 0;
+  let grid = false;
+  let streamScroll = 0;
+  let viewAnimation: Animation | undefined;
 
   function measure() {
     measureFrame = 0;
@@ -41,7 +49,14 @@ export function initDump(page: HTMLElement) {
 
   function render(time: number) {
     frame = 0;
+    if (grid) return;
     const scroll = Math.max(0, Math.min(maxScroll, window.scrollY));
+    const first = items[0];
+    // Fade from the top of the page until the first image reaches the center.
+    const fadeDistance = first ? Math.max(1, first.top + first.height / 2 - viewportHeight / 2) : 1;
+    const opacity = first ? Math.max(0, 1 - scroll / fadeDistance) : 1;
+    wordmark.style.opacity = String(opacity);
+    wordmark.style.visibility = opacity === 0 ? 'hidden' : '';
     description?.update(items, scroll, viewportHeight);
     if (nativeTimeline) return;
     const elapsed = lastTime ? Math.min(time - lastTime, 50) : 16;
@@ -70,8 +85,37 @@ export function initDump(page: HTMLElement) {
     else lastTime = 0;
   }
   function schedule() {
-    if ((!nativeTimeline || description) && !frame) frame = requestAnimationFrame(render);
+    if (!grid && !frame) frame = requestAnimationFrame(render);
   }
+  gridButton?.addEventListener('click', () => {
+    if (!grid) streamScroll = window.scrollY;
+    grid = !grid;
+    cancelAnimationFrame(frame);
+    cancelAnimationFrame(measureFrame);
+    frame = measureFrame = lastTime = 0;
+    viewAnimation?.cancel();
+    hideCursor();
+    page.toggleAttribute('data-grid', grid);
+    gridButton.setAttribute('aria-pressed', String(grid));
+    gridButton.textContent = grid ? 'Scroll View' : 'Grid View';
+    // A grid has several images per row, so there is no single centered description.
+    description?.update([], 0, viewportHeight);
+    items.forEach(entry => {
+      entry.initialized = false;
+      entry.image.style.transform = '';
+      entry.image.style.filter = '';
+    });
+    measure();
+    window.scrollTo({ top: grid ? 0 : Math.min(streamScroll, maxScroll), behavior: 'instant' });
+    if (!grid) {
+      cancelAnimationFrame(frame);
+      render(0);
+    }
+    if (!reduced.matches) viewAnimation = feed?.animate(
+      [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: 240, easing: 'ease-out' },
+    );
+  }, { signal });
   const observer = new IntersectionObserver(entries => {
     for (const observed of entries) {
       const entry = items.find(entry => entry.item === observed.target)!;
@@ -90,7 +134,7 @@ export function initDump(page: HTMLElement) {
   }
   function hideCursor() { delete cursor.dataset.visible; }
   document.addEventListener('pointermove', event => {
-    if (event.pointerType !== 'mouse' || (event.target as Element).closest('a, button, [data-dump-description]')) { hideCursor(); return; }
+    if (grid || event.pointerType !== 'mouse' || (event.target as Element).closest('a, button, [data-dump-description]')) { hideCursor(); return; }
     const x = Math.max(8, Math.min(event.clientX + 16, innerWidth - cursor.offsetWidth - 12));
     const y = Math.max(8, Math.min(event.clientY + 16, innerHeight - cursor.offsetHeight - 12));
     const clearance = 32;
@@ -112,7 +156,7 @@ export function initDump(page: HTMLElement) {
   document.documentElement.addEventListener('pointerleave', hideCursor, { signal });
   window.addEventListener('blur', hideCursor, { signal });
   document.addEventListener('visibilitychange', hideCursor, { signal });
-  if (!nativeTimeline || description) window.addEventListener('scroll', schedule, { passive: true, signal });
+  window.addEventListener('scroll', schedule, { passive: true, signal });
   window.addEventListener('resize', resize, { passive: true, signal });
   reduced.addEventListener('change', schedule, { signal });
   measure();
@@ -120,8 +164,10 @@ export function initDump(page: HTMLElement) {
     controller.abort();
     cancelAnimationFrame(frame);
     cancelAnimationFrame(measureFrame);
+    viewAnimation?.cancel();
     observer.disconnect();
     cleanupWordmark();
     description?.destroy();
+    cleanupLightbox();
   };
 }

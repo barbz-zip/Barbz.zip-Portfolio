@@ -14,7 +14,7 @@ export function centeredDumpImage(images: DumpImagePosition[], scroll: number, v
   return selected;
 }
 
-export function initDumpDescription(root: HTMLElement) {
+export function initDumpDescription(root: HTMLElement, { closeOnEscape = true } = {}) {
   const controller = new AbortController();
   const { signal } = controller;
   const descriptions = JSON.parse(root.dataset.descriptions ?? '[]') as Array<{ title: string; description: string }>;
@@ -48,28 +48,35 @@ export function initDumpDescription(root: HTMLElement) {
   toggle.addEventListener('click', () => { if (selected !== -1) setOpen(true); }, { signal });
   close.addEventListener('click', () => setOpen(false, true), { signal });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && open) { event.preventDefault(); setOpen(false, true); }
+    if (closeOnEscape && event.key === 'Escape' && open) { event.preventDefault(); setOpen(false, true); }
   }, { signal });
+
+  function select(index: number) {
+    if (index === selected) return;
+    selected = index;
+    const content = descriptions[index];
+    const visible = Boolean(content);
+    if (!visible) {
+      if (root.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
+      setOpen(false);
+    }
+    root.toggleAttribute('data-visible', visible);
+    root.inert = !visible;
+    root.setAttribute('aria-hidden', String(!visible));
+    if (content) {
+      title.textContent = content.title;
+      text.textContent = content.description;
+      panel.scrollTop = 0;
+    }
+  }
 
   return {
     update(images: DumpImagePosition[], scroll: number, viewportHeight: number) {
-      const index = centeredDumpImage(images, scroll, viewportHeight);
-      if (index === selected) return;
-      selected = index;
-      const content = descriptions[index];
-      const visible = Boolean(content);
-      if (!visible) {
-        if (root.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
-        setOpen(false);
-      }
-      root.toggleAttribute('data-visible', visible);
-      root.inert = !visible;
-      root.setAttribute('aria-hidden', String(!visible));
-      if (content) {
-        title.textContent = content.title;
-        text.textContent = content.description;
-        panel.scrollTop = 0;
-      }
+      select(centeredDumpImage(images, scroll, viewportHeight));
+    },
+    show(index: number) {
+      select(index);
+      if (descriptions[index]) setOpen(true);
     },
     destroy() { controller.abort(); cancelAnimationFrame(focusFrame); },
   };
