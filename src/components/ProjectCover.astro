@@ -4,4 +4,4 @@ import type { ProjectPreview } from '../data/projects';
 interface Props { cover: ProjectPreview['cover'] }
 const { cover } = Astro.props;
 ---
-<span class:list={['project-image', cover.crop]}><PortfolioImage src={cover.src} alt={cover.alt} widths={[320, 640, 960]} sizes="(max-width: 360px) 84vw, (max-width: 800px) 302px, 345px" draggable={false} /></span>
+<span class:list={['project-image', cover.crop]}><PortfolioImage src={cover.src} alt={cover.alt} position={cover.position} widths={[320, 640, 960]} sizes="(max-width: 360px) 84vw, (max-width: 800px) 302px, 345px" draggable={false} /></span>

@@ -1,8 +1,6 @@
-import fonts from './home-fonts.mjs';
-
-export interface HomeTypography { fonts: string[] }
-
-// The future Sanity adapter returns the homeTypography document in this shape.
+import {getHome} from './home.ts';
+export interface HomeTypography { fonts: string[]; text?: string }
 export async function getHomeTypography(): Promise<HomeTypography> {
-  return { fonts: [...fonts] };
+  const home = await getHome();
+  return {fonts: home.fonts, text: home.siteTitle};
 }

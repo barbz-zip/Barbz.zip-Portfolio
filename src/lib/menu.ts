@@ -4,7 +4,7 @@ export function initMenu(menu: HTMLElement) {
   const controller = new AbortController();
   const { signal } = controller;
   const indicator = menu.querySelector<HTMLElement>('.menu-indicator')!;
-  const items = [...menu.querySelectorAll<HTMLElement>('.menu-item')];
+  const items = [...menu.querySelectorAll<HTMLElement>('.menu-item, .contact-button')];
   let current = items.find(item => item.hasAttribute('aria-current')) ?? null;
   let pending: HTMLElement | null = null;
   let navigation: AbortSignal | null = null;
@@ -45,7 +45,7 @@ export function initMenu(menu: HTMLElement) {
     const normalize = (value: string) => value.replace(/\/$/, '') || '/';
     return items.find(item => {
       const href = item.getAttribute('href');
-      return href && normalize(new URL(href, location.href).pathname) === normalize(path);
+      return href && new URL(href, location.href).origin === location.origin && normalize(new URL(href, location.href).pathname) === normalize(path);
     }) ?? null;
   }
 

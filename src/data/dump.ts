@@ -1,3 +1,6 @@
+import {sanityClient, useLocalContent} from '../lib/cms/client.ts';
+import {dumpQuery} from '../lib/cms/queries.ts';
+import {imageFromSanity, type SanityImage} from '../lib/cms/media.ts';
 export const dumpImages = [
   { id: 'carton', src: '/images/dump/carton.png', alt: 'An opened, weathered milk carton.', width: 348, height: 714,
     title: 'Personal introduction', description: 'A personal introduction on a milk carton. A portrait, typography and small details turn an everyday piece of packaging into a playful profile.' },
@@ -8,3 +11,14 @@ export const dumpImages = [
   { id: 'truck', src: '/images/dump/truck.png', alt: 'Sketch of a truck.', width: 751, height: 299,
     title: 'Truck sketch', description: 'A side-by-side study of the truck, exploring its silhouette, colors and illustrated details. The drawing brings the different elements together as a single composition.' },
 ];
+
+export interface DumpImage {id: string; src: string; alt: string; width: number; height: number; title: string; description: string}
+export async function getDumpImages(): Promise<DumpImage[]> {
+  if (useLocalContent()) return [...dumpImages, ...dumpImages];
+  const documents = await sanityClient.fetch<Array<{_id: string; title: string; description: string; displayWidth?: number; image: SanityImage}>>(dumpQuery);
+  return documents.map(doc => {
+    const image = imageFromSanity(doc.image);
+    const width = doc.displayWidth || Math.min(image.width, 1011, 714 * image.width / image.height);
+    return {id: doc._id, title: doc.title, description: doc.description, ...image, width, height: width * image.height / image.width};
+  });
+}

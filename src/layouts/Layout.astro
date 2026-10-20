@@ -1,29 +1,60 @@
 ---
-import { sitePath } from '../lib/paths';
+import { sitePath, localPath } from '../lib/paths';
 import fontUrl from '../assets/abc-diatype-mono-trial.ttf?url';
 import Header from '../components/Header.astro';
+import {getHome} from '../data/home';
+import {getSettings, defaultSettings} from '../data/settings';
+import {metadataImageUrl} from '../lib/cms/media';
+import {canonicalUrl} from '../lib/seo';
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 interface Props { title?: string; page?: 'home' | 'index' | 'case' | 'about' | 'dump' }
-const { title = 'barbz.zip', page = 'case' } = Astro.props;
+const [home, settings] = await Promise.all([getHome(), getSettings()]);
+const { title = home.siteTitle, page = 'case' } = Astro.props;
+const pageTitle = page === 'home' && settings.seoTitle ? settings.seoTitle : title;
+const description = settings.seoDescription || defaultSettings.seoDescription;
+const canonical = canonicalUrl(settings.siteUrl, localPath(Astro.url.pathname));
+const favicon = settings.favicon?.asset ? metadataImageUrl(settings.favicon, 'favicon') : sitePath('/images/zip.png');
+const shareImage = settings.shareImage?.asset ? metadataImageUrl(settings.shareImage, 'sharing') : undefined;
+const shareTitle = settings.shareTitle || pageTitle;
+const shareDescription = settings.shareDescription || description;
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="barbz.zip — graphic design and etc. An archive of graphic design projects." />
+    <meta name="description" content={description} />
+    <meta name="robots" content={settings.noIndex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={home.siteTitle} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={shareTitle} />
+    <meta property="og:description" content={shareDescription} />
+    <meta name="twitter:card" content={shareImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={shareTitle} />
+    <meta name="twitter:description" content={shareDescription} />
+    {shareImage && <>
+      <meta property="og:image" content={shareImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content={settings.shareImage?.alt || ''} />
+      <meta name="twitter:image" content={shareImage} />
+      <meta name="twitter:image:alt" content={settings.shareImage?.alt || ''} />
+    </>}
     <meta name="theme-color" content={page === 'dump' ? '#000000' : '#ffffff'} />
-    <link rel="icon" type="image/png" href={sitePath('/images/zip.png')} />
+    <link rel="icon" type="image/png" href={favicon} />
     <link rel="preload" href={fontUrl} as="font" type="font/ttf" crossorigin />
-    <title>{title}</title>
+    <title>{pageTitle}</title>
     <ClientRouter />
   </head>
   <body class={`is-${page}`}>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Header />
+    <Header home={home} />
+    <span class="contact-feedback" data-contact-feedback role="status" aria-live="polite"></span>
     <slot />
-    {(page === 'home' || page === 'index') && <footer class="site-footer">graphic design and etc.</footer>}
+    {(page === 'home' || page === 'index') && <footer class="site-footer">{home.footerText}</footer>}
     <script>
       import '../lib/site';
     </script>

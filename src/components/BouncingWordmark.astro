@@ -11,6 +11,6 @@ const { typography } = Astro.props;
         <feComposite in2="SourceAlpha" operator="in" />
       </filter>
     </defs>
-    <text data-wordmark-text x="0" y="80" filter="url(#barbz-zip-wordmark-color)">barbz.zip</text>
+    <text data-wordmark-text x="0" y="80" filter="url(#barbz-zip-wordmark-color)">{typography.text || 'barbz.zip'}</text>
   </svg>
 </div>

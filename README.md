@@ -1,58 +1,66 @@
 # barbz-zip
 
-## Desenvolvimento
+## Development
 
-Projeto em Astro, TypeScript e CSS. Ambiente: Node.js 24 e pnpm 11.25.0.
+Built with Astro, TypeScript and CSS. Runtime: Node.js 24 and pnpm 11.25.0.
 
 ```sh
 pnpm install
+cp .env.example .env # Published Sanity content
 pnpm dev
-pnpm dev:mobile # Prévia na rede local, porta 4322
+pnpm dev:mobile # Local network preview on port 4322
 ```
 
-Servidor local: http://127.0.0.1:4321.
+Local server: http://127.0.0.1:4321.
 
 ```sh
-pnpm check   # Checagem de tipos
-pnpm test    # Testes
-pnpm build   # Build de produção
-pnpm preview # Prévia local do build
+pnpm check   # Type checking
+pnpm test    # Tests
+pnpm build   # Production build
+pnpm preview # Local build preview
+pnpm studio  # Local Studio at localhost:3333
+pnpm studio:check
+pnpm studio:build
+pnpm studio:deploy
 ```
 
-O arquivo `pnpm-lock.yaml` mantém as versões das dependências reproduzíveis.
-As prévias local e mobile e o build usam caches Vite separados para permitir execução simultânea.
+`pnpm-lock.yaml` keeps dependency versions reproducible. Local previews, mobile previews and builds use separate Vite caches so they can run simultaneously.
 
-Para validar o build com o prefixo do GitHub Pages:
+To validate the build with the GitHub Pages path prefix:
 
 ```sh
 GITHUB_PAGES=true pnpm build
 GITHUB_PAGES=true pnpm preview
 ```
 
-## Estrutura
+## Structure
 
-- `src/pages/`: rotas da home, index, about e páginas de projeto em `[slug].astro`.
-- `src/layouts/Layout.astro`: estrutura compartilhada, metadados, tipografia e navegação entre páginas.
-- `src/components/`: cabeçalho, galeria, capas, cards e diálogo dos projetos.
-- `src/components/PortfolioImage.astro`: variantes WebP responsivas e dimensões intrínsecas das imagens locais, geradas no build.
-- `src/data/`: conteúdo local e contrato dos projetos, acessado por `getProjects()`.
-- `src/components/BouncingWordmark.astro` e `src/lib/bouncing-wordmark.ts`: texto de fundo da home, movimento diagonal, colisões e tipografia dinâmica.
-- `src/data/home-fonts.mjs` e `src/data/home-typography.ts`: catálogo inicial de 160 URLs do Google Fonts e contrato para integração com o CMS.
-- `src/lib/wordmark-fonts.ts`: carregamento sob demanda com subconjunto de caracteres, preparação da próxima fonte e cache limitado.
-- `src/lib/gallery.ts`: slider infinito, autoplay de 50 px/s, drag e scroll; saída do hover e scroll sem espera adicional para retomar o autoplay.
-- `src/lib/gallery-math.ts`: normalização do loop e cálculo de cópias da galeria.
-- `src/pages/dump.astro` e `src/lib/dump.ts`: feed de imagens, profundidade na rolagem e descrição da imagem central; animação CSS nativa com alternativa JavaScript.
-- `src/lib/project-dialog.ts`: abertura e fechamento do pop-up e texto que acompanha o cursor.
-- `src/lib/project-index.ts`: interação da lista e prévia das capas junto ao cursor.
-- `src/lib/project-return.ts`: retorno à home ou ao index conforme a origem da navegação.
-- `src/lib/case-study.ts`: expansão das imagens na página do projeto.
-- `src/lib/menu.ts`: movimento do indicador do menu.
-- `src/lib/site.ts`: inicialização e limpeza das interações com o ClientRouter do Astro.
-- `src/lib/paths.ts`: caminhos de rotas e imagens compatíveis com o prefixo de publicação.
-- `src/styles/global.css`: estilos, responsividade e transições.
-- `src/assets/`: fontes processadas pelo Astro.
-- `public/images/`: imagens locais.
-- `sanity/schemaTypes/index.mjs`: schemas para a futura integração com Sanity, incluindo blocos de uma ou duas imagens e suas orientações. O front-end utiliza os dados locais enquanto o CMS não está conectado.
-- `tests/`: testes da galeria e dos blocos das páginas de projeto.
-- `astro.config.mjs`: configuração do Astro e do prefixo de publicação.
-- `.github/workflows/deploy.yml`: validação, testes, build e publicação da branch `main` no GitHub Pages.
+- `src/pages/`: Home, Index, About, Dump and project routes in `[slug].astro`.
+- `src/layouts/Layout.astro`: shared layout, metadata, typography and page transitions.
+- `src/components/`: header, gallery, covers, cards and project dialog.
+- `src/components/PortfolioImage.astro`: local image variants generated at build time and responsive images served by the Sanity CDN.
+- `src/data/`: content and settings contracts and adapters; `SANITY_CONTENT=sanity` reads the CMS and `local` uses fixtures.
+- `src/components/BouncingWordmark.astro` and `src/lib/bouncing-wordmark.ts`: Home background text, diagonal motion, collisions and dynamic typography.
+- `src/data/home-fonts.mjs` and `src/data/home-typography.ts`: initial catalog of 160 Google Fonts URLs and the CMS typography contract.
+- `src/lib/wordmark-fonts.ts`: on-demand loading with character subsetting, next-font preparation and a bounded cache.
+- `src/lib/gallery.ts`: infinite slider, 50 px/s autoplay, dragging and scrolling; autoplay resumes without an additional delay after hover or scrolling.
+- `src/lib/gallery-math.ts`: loop normalization and gallery copy calculations.
+- `src/pages/dump.astro` and `src/lib/dump.ts`: image feed, scroll depth and centered-image description; native CSS animation with a JavaScript fallback.
+- `src/lib/project-dialog.ts`: popup opening/closing and the cursor-following label.
+- `src/lib/project-index.ts`: list interactions and cover previews next to the cursor.
+- `src/lib/project-return.ts`: returns to Home or Index according to the navigation origin.
+- `src/lib/case-study.ts`: project-page media expansion.
+- `src/lib/menu.ts`: menu indicator motion.
+- `src/lib/site.ts`: interaction initialization and cleanup with Astro ClientRouter.
+- `src/lib/paths.ts`: route and image paths compatible with the deployment prefix.
+- `src/styles/global.css`: styles, responsive layouts and transitions.
+- `src/assets/`: fonts processed by Astro.
+- `public/images/`: local images.
+- `sanity/schemaTypes/index.ts`: Studio schemas for HOME, PROJECTS, ABOUT, DUMP and SETTINGS, including rows of one or two images/videos.
+- `src/lib/cms/`: public client, queries and image/video adapters for the BARBARA project (`uc4d6vam`).
+- `sanity/sanity.config.ts`: Studio structure; instructions in `sanity/README.md`.
+- `tests/`: gallery, CMS, media and project-page tests.
+- `astro.config.mjs`: Astro configuration and deployment prefix.
+- `.github/workflows/deploy.yml`: validation, tests, build and deployment of `main` to GitHub Pages.
+
+GitHub Pages uses static generation. After publishing content in the Studio, rerun the deployment workflow to update the public site. The CMS integration does not require tokens in the browser.

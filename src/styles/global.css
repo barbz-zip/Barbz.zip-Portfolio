@@ -45,9 +45,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible { background-color:
 .menu[data-enhanced] .menu-item { background: transparent; }
 .menu:not([data-enhanced]) .menu-item:hover { background: #fff; }
 [aria-disabled='true'] { cursor: default; }
-.contact-button { display: grid; place-items: center; padding: 0; width: 24px; height: 24px; border-radius: 50%; background: transparent; }
+.contact-button { position: relative; z-index: 1; cursor: pointer; display: grid; place-items: center; padding: 0; width: 24px; height: 24px; border-radius: 50%; background: transparent; }
 .contact-button img { display: block; }
 .contact-button--mobile { display: none; }
+.menu:not([data-enhanced]) .contact-button:hover, .contact-button--mobile:hover, .contact-button:focus-visible { background: #fff; }
+.menu-indicator:has(~ .contact-button[data-indicated]) { background: #fff; }
 main { min-height: 100svh; position: relative; }
 .wordmark-stage { position: fixed; inset: 0; overflow: hidden; pointer-events: none; user-select: none; z-index: -1; }
 .is-home main { isolation: isolate; }
@@ -125,7 +127,7 @@ main { min-height: 100svh; position: relative; }
 .case-media-row--landscape figure { aspect-ratio: 990 / 659; }
 .case-media-row--portrait figure { aspect-ratio: 476 / 632; }
 .case-media-row img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.case-media-row--original img { height: auto; }
+.case-media-row--original img, .case-media-row--original video { height: auto; }
 .case-study.is-expanded .case-sidebar { opacity: 0; transform: translateX(calc(-100% - 25px)); pointer-events: none; }
 .case-study.is-expanded .case-media { margin-left: 0; }
 .case-study.is-expanded .case-expand img { display: none; }
@@ -175,6 +177,10 @@ html:has(body.is-dump), body.is-dump { background: #000; color: #e6e6e6; color-s
 .is-dump .zip-mark-dark { display: block; position: relative; width: 34px; height: 34px; overflow: hidden; border-radius: 3px; }
 .is-dump .zip-mark-dark img { position: absolute; width: 185.41%; height: 214.24%; left: -43.78%; top: -52.11%; max-width: none; }
 .is-dump .contact-button .contact-icon-dark { display: block; }
+.is-dump .contact-button:is([data-indicated], :focus-visible) .contact-icon-dark,
+.is-dump .menu:not([data-enhanced]) .contact-button:hover .contact-icon-dark { display: none; }
+.is-dump .contact-button:is([data-indicated], :focus-visible) .contact-icon-light,
+.is-dump .menu:not([data-enhanced]) .contact-button:hover .contact-icon-light { display: block; }
 .is-dump .zip-label { display: flex; align-items: center; justify-content: center; position: absolute; top: -10px; left: 17px; width: 46px; height: 19px; border-radius: 24px; background: #363636; font-size: 14px; line-height: 1; font-weight: 300; }
 .is-dump .skip-link { color: #000; }
 .is-dump a:focus-visible, .is-dump button:focus-visible { color: #000; }
@@ -318,3 +324,11 @@ html:has(body.is-dump), body.is-dump { background: #000; color: #e6e6e6; color-s
   ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+/* CMS media keeps the same framing as still images. */
+.case-media-row video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.contact-feedback { position: fixed; top: 0; left: 0; z-index: 40; color: #fff; mix-blend-mode: difference; font-size: 14px; line-height: 1; white-space: nowrap; pointer-events: none; }
+.contact-feedback:empty { display: none; }
+
+/* Copy feedback takes priority over the Dump cursor until its timer expires. */
+body:has(> .contact-feedback:not(:empty)) .dump-cursor { opacity: 0; transition: none; }

@@ -1,7 +1,9 @@
 ---
 import { sitePath, localPath } from '../lib/paths';
 import PortfolioImage from './PortfolioImage.astro';
-const items = ['read'];
+import type {HomeContent} from '../data/home';
+interface Props {home: HomeContent}
+const {home} = Astro.props;
 const isIndex = localPath(Astro.url.pathname).replace(/\/$/, '') === '/index';
 const isAbout = localPath(Astro.url.pathname).replace(/\/$/, '') === '/about';
 const isHome = localPath(Astro.url.pathname) === '/';
@@ -18,8 +20,8 @@ const isDump = localPath(Astro.url.pathname).replace(/\/$/, '') === '/dump';
     <a class="menu-item" href={sitePath('/')} aria-current={isHome ? 'page' : undefined}>barbz.zip</a>
     <a class="menu-item" href={sitePath('/index/')} aria-current={isIndex ? 'page' : undefined}>index</a>
     <a class="menu-item" href={sitePath('/about/')} aria-current={isAbout ? 'page' : undefined}>about</a>
-    {items.map(label => <button class="menu-item" type="button" aria-disabled="true" title="Coming soon">{label}</button>)}
-    <button class="contact-button" type="button" aria-label="Contact — coming soon" aria-disabled="true" title="Contact coming soon"><img class="contact-icon-light" src={sitePath('/images/message.svg')} width="24" height="24" alt="" /><img class="contact-icon-dark" src={sitePath('/images/dump/message.svg')} width="24" height="24" alt="" /></button>
+    {home.readUrl ? <a class="menu-item" href={home.readUrl} target="_blank" rel="noopener noreferrer">read</a> : <button class="menu-item" type="button" aria-disabled="true" title="Coming soon">read</button>}
+    <button class="contact-button" type="button" data-copy-email={home.email} aria-label={home.email ? 'Copy email address' : 'Contact — coming soon'} aria-disabled={home.email ? undefined : 'true'}><img class="contact-icon-light" src={sitePath('/images/message.svg')} width="24" height="24" alt="" /><img class="contact-icon-dark" src={sitePath('/images/dump/message.svg')} width="24" height="24" alt="" /></button>
   </nav>
-  <button class="contact-button contact-button--mobile" type="button" aria-label="Contact — coming soon" aria-disabled="true" title="Contact coming soon"><img src={sitePath('/images/message-mobile.svg')} width="30" height="30" alt="" /></button>
+  <button class="contact-button contact-button--mobile" type="button" data-copy-email={home.email} aria-label={home.email ? 'Copy email address' : 'Contact — coming soon'} aria-disabled={home.email ? undefined : 'true'}><img src={sitePath('/images/message-mobile.svg')} width="30" height="30" alt="" /></button>
 </header>

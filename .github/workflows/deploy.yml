@@ -27,6 +27,7 @@ jobs:
           build-cmd: pnpm check && pnpm test && pnpm build
         env:
           GITHUB_PAGES: 'true'
+          SANITY_CONTENT: 'sanity'
 
   deploy:
     needs: build

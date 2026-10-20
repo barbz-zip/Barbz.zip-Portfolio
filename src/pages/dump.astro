@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import DumpDescription from '../components/DumpDescription.astro';
-import { dumpImages } from '../data/dump';
+import { getDumpImages } from '../data/dump';
+import PortfolioImage from '../components/PortfolioImage.astro';
 import { sitePath } from '../lib/paths';
 import { Image } from 'astro:assets';
 import carton from '../../public/images/dump/carton.png';
@@ -9,7 +10,7 @@ import trifold from '../../public/images/dump/trifold.png';
 import photograph from '../../public/images/dump/photograph.png';
 import truck from '../../public/images/dump/truck.png';
 const sources = { carton, trifold, photograph, truck };
-const previewImages = [...dumpImages, ...dumpImages];
+const previewImages = await getDumpImages();
 ---
 <Layout page="dump" title="barbz.dump.zip">
   <main id="main" class="dump-page" data-dump>
@@ -23,10 +24,10 @@ const previewImages = [...dumpImages, ...dumpImages];
       {previewImages.map((item, index) => (
         <figure class={`dump-item dump-item--${item.id}`} style={`--image-width: ${item.width}px; --image-ratio: ${item.width} / ${item.height}; view-timeline-name: --dump-image-${index}; --image-timeline: --dump-image-${index}`} data-dump-item>
           <div class="dump-image" data-dump-image>
-            <Image src={sources[item.id as keyof typeof sources]} alt={item.alt}
+            {item.src.startsWith('https://') ? <PortfolioImage src={item.src} alt={item.alt} widths={[400, 800, 1200, 1600]} sizes={`(max-width: 800px) 100vw, ${Math.ceil(item.width * 1.12)}px`} loading={index < 2 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} draggable={false} /> : <Image src={sources[item.id as keyof typeof sources]} alt={item.alt}
               widths={[400, 800, 1200, 1600].filter(width => width <= sources[item.id as keyof typeof sources].width)}
               sizes={`(max-width: 800px) ${item.id === 'carton' ? '112vw' : '100vw'}, ${Math.ceil(item.width * 1.12 * (item.id === 'carton' ? 1.71 : 1.05))}px`}
-              format="webp" quality={85} loading={index < 2 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} decoding="async" draggable="false" />
+              format="webp" quality={85} loading={index < 2 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} decoding="async" draggable="false" />}
           </div>
           <button class="dump-grid-open" type="button" data-dump-open={index} aria-label={`View image: ${item.title}`} aria-haspopup="dialog"></button>
         </figure>

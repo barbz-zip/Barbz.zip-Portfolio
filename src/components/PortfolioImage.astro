@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import {sanityProjectId, sanityDataset} from '../lib/cms/config';
 
 interface Props {
   src: string;
@@ -11,14 +12,23 @@ interface Props {
   loading?: 'eager' | 'lazy';
   fetchpriority?: 'high' | 'low' | 'auto';
   draggable?: boolean;
+  position?: string;
 }
 
-const { src, widths, ...attributes } = Astro.props;
+const { src, widths, position, ...attributes } = Astro.props;
 // Build-time metadata keeps image dimensions and responsive variants out of client JS.
 const images = import.meta.glob<{ default: ImageMetadata }>('../../public/images/**/*.{png,jpg,jpeg,webp}');
+const remote = src.startsWith('https://cdn.sanity.io/images/');
+if (remote && !new URL(src).pathname.startsWith(`/images/${sanityProjectId}/${sanityDataset}/`)) throw new Error('Unexpected image project.');
 const load = images[`../../public${src}`];
-if (!load) throw new Error(`Missing portfolio image: ${src}`);
-const { default: image } = await load();
-const candidates = [...new Set(widths.map(width => Math.min(width, image.width)))].sort((a, b) => a - b);
+if (!remote && !load) throw new Error(`Missing portfolio image: ${src}`);
+const image = load ? (await load()).default : undefined;
+const candidates = [...new Set(widths.map(width => Math.min(width, image?.width ?? width)))].sort((a, b) => a - b);
+function remoteUrl(width: number) {const url = new URL(src); url.searchParams.set('w', String(width)); url.searchParams.set('fit', 'max'); return url.href;}
+const remoteSource = remote ? new URL(src) : null;
+const originalDimensions = remoteSource?.pathname.match(/-(\d+)x(\d+)\./);
+const rect = remoteSource?.searchParams.get('rect')?.split(',').map(Number);
+const remoteWidth = rect?.[2] ?? (originalDimensions ? Number(originalDimensions[1]) : undefined);
+const remoteHeight = rect?.[3] ?? (originalDimensions ? Number(originalDimensions[2]) : undefined);
 ---
-<Image src={image} widths={candidates} width={candidates[candidates.length - 1]} format="webp" quality={90} decoding="async" {...attributes} />
+{remote ? <img src={remoteUrl(candidates[candidates.length - 1])} srcset={candidates.map(width => `${remoteUrl(width)} ${width}w`).join(', ')} width={remoteWidth} height={remoteHeight} decoding="async" style={position ? {objectPosition: position} : undefined} {...attributes} /> : image && <Image src={image} widths={candidates} width={candidates[candidates.length - 1]} format="webp" quality={90} decoding="async" style={position ? {objectPosition: position} : undefined} {...attributes} />}

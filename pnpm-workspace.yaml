@@ -1,3 +1,5 @@
+packages:
+  - sanity
 allowBuilds:
   esbuild: true
   sharp: true

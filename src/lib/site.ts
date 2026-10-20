@@ -1,3 +1,4 @@
+import { initContact } from './contact';
 import { initGallery } from './gallery';
 import { initBouncingWordmark } from './bouncing-wordmark';
 import { initDump } from './dump';
@@ -46,3 +47,6 @@ document.addEventListener('astro:page-load', () => {
   const dump = document.querySelector<HTMLElement>('[data-dump]');
   if (dump) cleanups.push(initDump(dump));
 });
+
+// Delegation also covers the persisted header after Astro navigation.
+initContact();

@@ -1,76 +1,76 @@
-# barbz-zip — revisão técnica
+# barbz-zip — technical review
 
-Revisão local de 15/10/2026. Escopo: rotas, componentes, scripts de interação, estilos, conteúdo local, schemas do CMS, testes, configuração e publicação. Nenhum commit ou deploy realizado.
+Historical local review dated October 15, 2026. Scope: routes, components, interaction scripts, styles, local content, CMS schemas, tests, configuration and deployment. No commit or deployment was performed during this review. The findings below describe the project at that date.
 
-## Correções aplicadas
+## Applied fixes
 
-### Imagens desproporcionais ao tamanho de exibição
+### Images oversized for their display dimensions
 
-As cinco capas da home somavam 8,85 MB. O ícone escuro do dump tinha 3550 × 4096 px e 8,21 MB, embora apareça num botão de 34 px. Imagens ocultas por CSS também podem ser requisitadas pelo navegador.
+The five Home covers totaled 8.85 MB. The dark Dump icon was 3550 × 4096 px and 8.21 MB despite appearing inside a 34 px button. Browsers can also request images hidden by CSS.
 
-`src/components/PortfolioImage.astro` agora gera WebP e `srcset` no build para capas, pop-ups, páginas de projeto, retrato e ícone do dump. Os arquivos originais e os recortes CSS foram preservados. A resolução disponível nunca excede a original. Os elementos recebem largura e altura intrínsecas, inclusive os futuros blocos de proporção original, reduzindo deslocamentos durante o carregamento.
+`src/components/PortfolioImage.astro` now generates WebP images and `srcset` at build time for covers, popups, project pages, the portrait and the Dump icon. Original files and CSS crops were preserved. Available resolution never exceeds the original. Elements receive intrinsic width and height, including future original-proportion blocks, reducing layout shifts during loading.
 
-Comparação dos arquivos gerados para cinco capas a 960 px e ícone a 160 px — variantes selecionadas no desktop com densidade 2×:
+Comparison of generated files for five covers at 960 px and the icon at 160 px — variants selected on a desktop with 2× pixel density:
 
-| Conjunto | Antes | Depois |
+| Assets | Before | After |
 | --- | ---: | ---: |
-| Cinco capas | 8.850.050 bytes | 336.708 bytes |
-| Ícone do dump | 8.214.498 bytes | 2.776 bytes |
-| Total | 17.064.548 bytes | 339.484 bytes |
+| Five covers | 8,850,050 bytes | 336,708 bytes |
+| Dump icon | 8,214,498 bytes | 2,776 bytes |
+| Total | 17,064,548 bytes | 339,484 bytes |
 
-Redução aproximada de 98% nesse conjunto. Não é uma medição do carregamento completo: HTML, CSS, JavaScript, fontes, outras imagens e cache do navegador não entram nessa soma. O formato de origem de alguns arquivos não corresponde à extensão `.png`; o processador lê os metadados reais.
+Approximately 98% smaller for this asset set. This is not a full page-load measurement: HTML, CSS, JavaScript, fonts, other images and browser caching are excluded. Some source formats do not match their `.png` extensions; the processor reads the actual metadata.
 
-### Galeria executando quadros mesmo quando parada
+### Gallery scheduling frames while idle
 
-`src/lib/gallery.ts` mantinha um `requestAnimationFrame` contínuo mesmo durante pausa por hover, abertura do diálogo e preferência de movimento reduzido. Agora só agenda novos quadros enquanto há autoplay ou movimento a acomodar. Entrada de scroll, drag, teclado, saída do hover e fechamento do diálogo reativam o trabalho. O temporizador de retomada é cancelado ao sair da página ou ocultar a aba.
+`src/lib/gallery.ts` previously kept a continuous `requestAnimationFrame` loop during hover pauses, open dialogs and reduced-motion preferences. It now schedules frames only during autoplay or while motion settles. Scrolling, dragging, keyboard input, leaving hover and closing the dialog resume processing. The resume timer is cancelled when leaving the page or hiding the tab.
 
-Três testes de regressão cobrem pausa com diálogo, movimento reduzido com scroll manual e retomada imediata após hover. Os testes existentes de toque continuam passando.
+Three regression tests cover dialog pauses, reduced motion with manual scrolling and immediate resume after hover. Existing touch tests continue to pass.
 
-### Ambiente de desenvolvimento
+### Development environment
 
-A correção anterior do conflito de cache foi mantida: prévia local, prévia mobile e build têm diretórios Vite separados. README documenta `pnpm dev:mobile` e o processamento das imagens.
+The earlier cache-conflict fix was preserved: local preview, mobile preview and builds have separate Vite directories. The README documents `pnpm dev:mobile` and image processing.
 
-## Pendências prioritárias
+## Priority follow-ups
 
-### 1. Dependências com alertas de segurança — alta prioridade
+### 1. Dependencies with security advisories — high priority
 
-`pnpm audit --json` reportou 10 avisos: 1 crítico, 4 altos, 3 moderados e 2 baixos. Dependências instaladas: Astro 6.4.8, Sharp 0.34.5, esbuild 0.27.7 e http-cache-semantics 4.2.0.
+`pnpm audit --json` reported 10 advisories: 1 critical, 4 high, 3 moderate and 2 low. Installed dependencies: Astro 6.4.8, Sharp 0.34.5, esbuild 0.27.7 and http-cache-semantics 4.2.0.
 
-| Pacote | Achado e versão corrigida informada pela auditoria |
+| Package | Finding and fixed version reported by the audit |
 | --- | --- |
-| Astro | [Processamento de AVIF malicioso](https://github.com/advisories/GHSA-26w7-cxv4-gfx2): corrigido em 7.2.8. Há também avisos sobre interpolação de atributos/transições e limites do caminho base. |
-| Sharp | [librsvg](https://github.com/advisories/GHSA-wq5f-xc86-pv6w): corrigido em 0.35.5; outros avisos tratam de libvips/libheif. |
-| esbuild | [Leitura de arquivos no servidor de desenvolvimento Windows](https://github.com/advisories/GHSA-g7r4-m6w7-qqqr): corrigido em 0.28.1. |
-| http-cache-semantics | [Respostas de cache entre usuários](https://github.com/advisories/GHSA-ch52-4w7c-c8xp): corrigido em 4.3.0. |
+| Astro | [Malicious AVIF processing](https://github.com/advisories/GHSA-26w7-cxv4-gfx2): fixed in 7.2.8. Additional advisories concern attribute interpolation/transitions and base-path boundaries. |
+| Sharp | [librsvg](https://github.com/advisories/GHSA-wq5f-xc86-pv6w): fixed in 0.35.5; other advisories concern libvips/libheif. |
+| esbuild | [File reads through the Windows development server](https://github.com/advisories/GHSA-g7r4-m6w7-qqqr): fixed in 0.28.1. |
+| http-cache-semantics | [Cached responses shared between users](https://github.com/advisories/GHSA-ch52-4w7c-c8xp): fixed in 4.3.0. |
 
-Contexto: a publicação atual é estática, sem servidor Astro processando uploads em produção. As imagens usadas pelo projeto são locais; não há formulário de upload ou integração CMS ativa. O aviso crítico depende de processamento de AVIF não confiável, segundo o mantenedor. Isso limita a exposição atual, mas não elimina a necessidade de atualizar o ambiente de desenvolvimento/build antes de aceitar novos fluxos de imagens.
+Context at the time of review: deployment was static, with no Astro server processing production uploads. Images were local, with no upload form or active CMS integration. According to the maintainer, the critical advisory depends on processing untrusted AVIF files. This limits the exposure at that stage but does not remove the need to update the development/build environment before accepting new image workflows.
 
-As versões não foram atualizadas nesta revisão: remover todos os avisos exige migração do Astro 6 para 7, além de validar dependências transitivas, pipeline de imagens e ClientRouter. Próxima frente: seguir o [guia oficial de migração](https://docs.astro.build/en/guides/upgrade-to/v7/), atualizar o lockfile, repetir a auditoria e testar as rotas e transições em Safari real.
+Versions were not upgraded in this review. Resolving every advisory requires migrating Astro 6 to 7 and validating transitive dependencies, the image pipeline and ClientRouter. Next steps: follow the [official migration guide](https://docs.astro.build/en/guides/upgrade-to/v7/), update the lockfile, rerun the audit and test routes and transitions in Safari on a physical device.
 
-### 2. Fonte principal pesada
+### 2. Large primary font
 
-`src/assets/abc-diatype-mono-trial.ttf` tem 799.908 bytes e é pré-carregada em todas as rotas. Após otimizar as capas, ela passa a ser um recurso relevante do carregamento inicial. Preparar a versão final WOFF2 e considerar um subconjunto dos caracteres necessários, mantendo os símbolos usados na interface. O arquivo atual identifica-se como trial; confirmar o arquivo definitivo antes da publicação final.
+`src/assets/abc-diatype-mono-trial.ttf` is 799,908 bytes and preloaded on every route. After cover optimization, it becomes a significant initial-load resource. Prepare the final WOFF2 version and consider subsetting required characters while preserving interface symbols. The current file identifies itself as a trial; confirm the final font file before the final release.
 
-### 3. Integração CMS ainda incompleta
+### 3. Incomplete CMS integration
 
-Sanity possui schemas para projetos e tipografia, mas nenhum cliente, dataset, webhook ou adaptador conectado. About e dump continuam com conteúdo local; o dump duplica intencionalmente quatro itens para testes de navegação. Para o CMS, adicionar o modelo do dump e descrições, conteúdo do about, validação de slugs reservados (`index`, `about`, `dump`) e dimensões dos assets. O novo componente de imagem aceita arquivos locais; o adaptador remoto precisará fornecer URLs responsivas e dimensões do CDN do Sanity.
+At the time of review, Sanity had project and typography schemas but no connected client, dataset, webhook or adapter. About and Dump still used local content; Dump intentionally duplicated four entries for navigation testing. CMS work should add the Dump model and descriptions, About content, reserved-slug validation (`index`, `about`, `dump`) and asset dimensions. The image component accepts local files; the remote adapter will need responsive URLs and dimensions from the Sanity CDN.
 
-### 4. Conteúdo e metadados de publicação
+### 4. Publication content and metadata
 
-O texto do about ainda contém referências a outro profissional no conteúdo de demonstração. Há cases com texto provisório, créditos vazios, contato/read e Grid View indisponíveis conforme a etapa atual. O layout compartilha uma descrição SEO genérica e ainda não oferece metadados sociais específicos por projeto. Resolver com o conteúdo definitivo, sem inventar dados pessoais ou destinos.
+The About placeholder copy still referred to another professional. Some case studies had temporary text and empty credits; Contact, Read and Grid View were unavailable at that stage. The layout shared a generic SEO description without project-specific social metadata. Replace placeholders with final content without inventing personal details or destinations.
 
-### 5. Custo de interação no dump a acompanhar
+### 5. Monitor Dump interaction costs
 
-O cursor do dump consulta controles e mede suas áreas em cada `pointermove`; a pixelização atualiza atributos SVG de múltiplas células. Hoje o feed tem oito itens e o efeito pixelado só é preparado após hover de mouse, o que reduz impacto no mobile. Se o feed crescer ou novos controles forem adicionados, agrupar medições do cursor por quadro e atualizar somente células que mudaram. Não houve medição de FPS em dispositivo físico nesta revisão; esse ponto é uma oportunidade identificada no código, não uma regressão demonstrada.
+The Dump cursor queries controls and measures their bounds on every `pointermove`; pixelation updates SVG attributes on multiple cells. At the time of review, the feed had eight entries, and the pixel effect was prepared only after mouse hover, reducing mobile impact. If the feed grows or controls are added, batch cursor measurements per frame and update only changed cells. No FPS measurement on a physical device was performed during this review; this is a code-level optimization opportunity, not a demonstrated regression.
 
-## Verificação
+## Verification
 
-- 22 testes passaram, incluindo drag, toque, loop, fontes, descrição e fallback de scroll do dump.
-- `pnpm check`: zero erros, avisos ou sugestões.
-- Build estático com `GITHUB_PAGES=true`: nove rotas geradas.
-- Conferência dos caminhos de imagens e `srcset` do build com o prefixo do GitHub Pages: nenhum arquivo ausente.
-- Navegador local: galeria em movimento, capas carregadas, abertura via teclado, navegação ao case, expansão, retorno index → projeto → index e home em 390 × 844.
-- A validação mobile utilizou viewport de navegador; não substitui teste no iPhone 15/Safari físico.
-- `git diff --check`: sem erros de whitespace.
+- 22 tests passed, including dragging, touch, looping, fonts, descriptions and the Dump scroll fallback.
+- `pnpm check`: no errors, warnings or hints.
+- Static build with `GITHUB_PAGES=true`: nine routes generated.
+- Build image paths and `srcset` checked with the GitHub Pages prefix: no missing files.
+- Local browser: moving gallery, loaded covers, keyboard opening, case navigation, media expansion, Index → project → Index return flow and Home at 390 × 844.
+- Mobile validation used a browser viewport; it does not replace testing on a physical iPhone 15 with Safari.
+- `git diff --check`: no whitespace errors.
 
-Foram preservados os trabalhos locais anteriores. Esta revisão não conecta serviços, publica conteúdo nem altera a lógica visual solicitada.
+Earlier local work was preserved. This review did not connect services, publish content or change the requested visual behavior.

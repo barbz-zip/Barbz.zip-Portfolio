@@ -3,12 +3,12 @@ import { test } from 'node:test';
 import fonts from '../src/data/home-fonts.mjs';
 import { googleFontFamily, googleFontStylesheet, validateFontLinks } from '../src/lib/google-fonts.mjs';
 import { advanceAxis, pickFont } from '../src/lib/wordmark-motion.ts';
-import { homeTypography } from '../sanity/schemaTypes/index.mjs';
+import {localHome} from '../src/data/home.ts';
 
 test('the supplied catalog has 160 valid unique families and seeds the CMS', () => {
   assert.equal(fonts.length, 160);
   assert.equal(validateFontLinks(fonts), true);
-  assert.deepEqual(homeTypography.initialValue.fonts, fonts);
+  assert.deepEqual(localHome.fonts, fonts);
 });
 
 test('Google Fonts URLs are normalized and only the displayed text is requested', () => {

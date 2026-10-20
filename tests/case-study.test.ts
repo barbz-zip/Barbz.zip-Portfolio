@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
-import { getProjects } from '../src/data/projects.ts';
-import { validateGalleryRow } from '../sanity/schemaTypes/index.mjs';
+import { getLocalProjects } from '../src/data/projects.ts';
+import { validateGalleryRow } from '../sanity/schemaTypes/validation.mjs';
 
 test('CMS supports every image count and orientation combination', () => {
   for (const orientation of ['portrait', 'landscape', 'original']) {
@@ -15,7 +15,7 @@ test('CMS supports every image count and orientation combination', () => {
 });
 
 test('every modal destination has a unique valid project route and valid image blocks', async () => {
-  const projects = await getProjects();
+  const projects = await getLocalProjects();
   assert.equal(new Set(projects.map(project => project.slug)).size, projects.length);
   for (const project of projects) {
     assert.match(project.slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);

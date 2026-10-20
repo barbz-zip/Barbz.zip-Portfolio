@@ -1,3 +1,6 @@
+import {sanityClient, useLocalContent} from '../lib/cms/client.ts';
+import {aboutQuery} from '../lib/cms/queries.ts';
+import {imageFromSanity, type SanityImage} from '../lib/cms/media.ts';
 // Preview copy and destinations supplied by the Figma layout.
 export const about = {
   name: 'Barbara Cadorna',
@@ -32,3 +35,17 @@ export const about = {
     { title: 'PMC X Coalesce Collab: McGoblin Burger on NY Post', href: 'https://nypost.com/2024/04/04/business/nfts-arent-totally-dead-as-crypto-goblins-swarm-to-nyc-this-week/' },
   ],
 };
+
+export interface AboutContent {
+  name: string; caption: string; portrait: string; portraitAlt: string; biography: string[];
+  recognitionsTitle: string; pressTitle: string;
+  recognitions: Array<{icon?: string; title: string; href?: string}>;
+  press: Array<{title: string; href?: string; continuation?: {title: string; href?: string}}>;
+}
+export async function getAbout(): Promise<AboutContent> {
+  if (useLocalContent()) return {...about, portraitAlt: `Portrait of ${about.name} wearing a red jacket.`, recognitionsTitle: 'Recognitions', pressTitle: 'Press'};
+  const doc = await sanityClient.fetch<(Omit<AboutContent, 'portrait'> & {portrait: SanityImage}) | null>(aboutQuery);
+  if (!doc) throw new Error('Publish ABOUT in the BARBARA Studio before building the site.');
+  const portrait = imageFromSanity(doc.portrait);
+  return {...doc, portrait: portrait.src, portraitAlt: portrait.alt, biography: doc.biography || [], recognitions: doc.recognitions || [], press: doc.press || []};
+}

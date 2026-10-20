@@ -1,21 +1,47 @@
-# barbz-zip — conteúdo dos projetos
+# barbz-zip — Sanity Studio
 
-Schema preparado para o futuro Studio; nenhuma instância ou credencial está conectada nesta etapa. Importe `schemaTypes` de `schemaTypes/index.mjs` na configuração do Sanity.
+Standalone Studio for **BARBARA → Barbz.zip Portfolio** only.
 
-Cada projeto tem nome, ano (`year`), slug, capa, texto do pop-up e uma página interna. `caseStudy.gallery` é uma lista ordenável de blocos; cada bloco define separadamente:
+- Project: `uc4d6vam`
+- Dataset: `production` (public portfolio content)
+- Studio: https://barbz-zip.sanity.studio/
+- Local Studio: `pnpm studio` → http://localhost:3333
 
-- `layout`: `single` (uma imagem) ou `pair` (duas imagens lado a lado).
-- `orientation`: `portrait`, `landscape` ou `original`.
-- `images`: uma ou duas imagens, com texto alternativo e hotspot.
+## Content structure
 
-Isso permite uma vertical sozinha, duas horizontais, uma horizontal ou duas verticais. A referência Nursegrid usa uma horizontal seguida de duas verticais. A validação impede publicar blocos com quantidade incorreta de imagens. A ordem dos blocos e das imagens é preservada no site.
+- **HOME**: site title / animated text, bottom-center text, Google Fonts URLs, contact email and external Read link. The contact button copies the email. Empty contact/Read fields disable those actions. The font loader fetches only the text glyphs, prepares the next font and keeps a bounded cache.
+- **PROJECTS**: shared Home/Index list, title, URL, year, attributes and cover. Projects are sorted by year, newest first, then alphabetically within each year. Project pages contain services, paragraphs, credits and reorderable gallery rows. Each row accepts one media item or two side by side, in original, portrait or landscape proportions. Images and MP4/WebM files can be combined; videos autoplay muted, loop, play inline and have no controls. Posters are supported.
+- **ABOUT**: portrait with alternative text, name, caption, biography paragraphs, editable section headings, recognitions and press links.
+- **DUMP**: independently editable images, alternative text, title, description and display order. Scroll and Grid views use the same documents. New images retain their dimensions and transparency.
 
-O adaptador futuro deve transformar `_id` em `id`, `slug.current` em `slug`, `_key` dos blocos em `key` e os assets em `{ src, alt }`, usando crop/hotspot nas URLs das imagens. O resultado deve respeitar os tipos `Project` e `GalleryRow` em `src/data/projects.ts`. Home e index usam a mesma ordem; ano e descrição curta são compartilhados entre as páginas. O layout não depende do número de blocos e não cadastra duplicatas para o slider infinito.
+HOME, ABOUT and SETTINGS are singletons. Their documents cannot be duplicated or deleted from the Studio. Projects sort by four-digit year descending, then title and document ID. The legacy project order field is hidden and no longer used; Dump keeps its numeric order field. Project slugs are unique and cannot overlap site routes. Upload multiple files into a gallery row, then choose its one/two arrangement; publishing validates the number of files. Reorder rows and media by dragging.
 
-## Tipografia animada da home
+- **SETTINGS**: favicon, sharing title/text/image, optional Home SEO title, site description, public URL for canonical links and site-wide noindex. Open Graph and Twitter metadata are rendered in the HTML. The share image is exported as 1200 × 630 JPEG and the favicon as 64 × 64 PNG. Empty sharing fields use the page title and SEO description.
 
-O documento `homeTypography` contém `fonts`, uma lista editável de URLs. Ao criar o documento no Studio, a lista começa com as 160 fontes fornecidas em `src/data/home-fonts.mjs`. É possível adicionar, remover e substituir links de `https://fonts.google.com/specimen/Nome+Da+Fonte`; links da API CSS do Google com uma única família também são aceitos. Links inválidos e famílias duplicadas impedem a publicação.
+## Development
 
-O futuro adaptador de `getHomeTypography()` em `src/data/home-typography.ts` deve retornar `{ fonts: string[] }` a partir desse documento. Consulta sugerida: `*[_type == "homeTypography"][0]{fonts}`. Nesta etapa, os dados continuam locais; nenhum documento remoto foi criado ou alterado. Com o site estático, uma publicação no CMS deverá disparar um novo build para atualizar a lista.
+From the repository root:
 
-O navegador começa com IBM Plex Mono, conforme o layout, e prepara uma fonte aleatória da lista para a próxima colisão. As requisições usam `text=barbz.zip`, restringindo os arquivos aos caracteres exibidos. As trocas acontecem apenas nas bordas e somente com a fonte pronta; em uma falha ou conexão lenta, outra fonte já carregada é reutilizada. Se nenhuma alternativa estiver disponível, mantém a atual sem interromper o movimento. Até oito fontes já utilizadas ficam no cache em memória; a navegação encerra a animação, cancela requisições pendentes e remove as fontes desse componente. A preferência de movimento reduzido mantém o texto estático.
+```sh
+pnpm install
+pnpm studio
+pnpm studio:check
+pnpm studio:build
+pnpm studio:deploy
+```
+
+The Studio has its own TypeScript configuration and dependencies. Its bundle is deployed independently of the Astro site. The CLI configuration pins the BARBARA project/dataset and deployed Studio app ID. No write token belongs in the frontend or repository.
+
+## Initial import
+
+`pnpm --dir sanity seed` uses the logged-in Sanity CLI account. It uploads the existing local portfolio assets and creates only missing documents, refusing any project/dataset other than BARBARA. It never overwrites existing documents. The eight Dump entries preserve the duplicated navigation examples and can now be edited or deleted independently. Initial About copy and incomplete case studies remain the prototype content and should be revised editorially in the Studio.
+
+## Frontend data flow
+
+Copy `.env.example` to `.env`. `SANITY_CONTENT=sanity` fetches published content from the public Content Lake API using the official Sanity client. No token is required. `SANITY_CONTENT=local` uses the original fixtures for offline development. Drafts are not exposed to the public frontend.
+
+Local Astro requests read the latest published content when the page is refreshed. GitHub Pages is static: a CMS publication is included in the next site build, not in an already-deployed HTML file. The workflow reads Sanity content; run **Actions → barbz-zip — GitHub Pages → Run workflow** after publishing. Automatic rebuilds from a Sanity webhook are not configured. Do not send a GitHub token from the browser or put one in a Sanity document.
+
+## Validation
+
+`pnpm check`, `pnpm test` and `pnpm build` validate the frontend. `pnpm studio:check`, `pnpm studio:build` and `pnpm --dir sanity exec sanity schemas validate` validate the Studio. Use `pnpm --dir sanity exec sanity documents validate --workspace barbz-zip --yes` to validate remote documents before deployment.

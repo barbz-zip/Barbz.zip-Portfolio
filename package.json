@@ -9,10 +9,17 @@
     "build": "astro build",
     "preview": "astro preview --host 127.0.0.1",
     "check": "astro check",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "studio": "pnpm --dir sanity dev",
+    "studio:build": "pnpm --dir sanity build",
+    "studio:check": "pnpm --dir sanity check",
+    "studio:deploy": "pnpm --dir sanity deploy"
   },
   "dependencies": {
+    "@sanity/client": "^8.9.0",
+    "@sanity/image-url": "^2.1.1",
     "astro": "^6.0.0",
+    "groq": "^6.20.0",
     "sharp": "^0.34.5"
   },
   "devDependencies": {
