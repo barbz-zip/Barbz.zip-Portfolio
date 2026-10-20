@@ -67,7 +67,7 @@ export function initContact() {
     if (currentRequest !== request || !feedback) return;
     feedback.textContent = copied ? 'Copied' : 'Unable to copy';
     position();
-    timer = setTimeout(reset, 2000);
+    timer = setTimeout(reset, 1000);
   });
 
   document.addEventListener('astro:before-preparation', reset);

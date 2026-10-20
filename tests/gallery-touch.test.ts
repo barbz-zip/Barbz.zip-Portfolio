@@ -58,10 +58,10 @@ function gallery(t: TestContext) {
   t.mock.method(performance, 'now', () => now);
   const cleanup = initGallery(root as unknown as HTMLElement);
   t.after(() => { cleanup?.(); restoreGlobals.forEach(restore => restore()); });
-  function pointer(type: string, x: number, y = 100, origin: unknown = viewport) {
+  function pointer(type: string, x: number, y = 100, origin: unknown = viewport, pointerType = 'touch') {
     const event = new Event(type, { cancelable: true, bubbles: true });
     Object.defineProperties(event, Object.fromEntries(Object.entries({
-      pointerId: 1, isPrimary: true, button: 0, pointerType: 'touch',
+      pointerId: 1, isPrimary: true, button: 0, pointerType,
       clientX: x, clientY: y, timeStamp: now, target: origin,
     }).map(([key, value]) => [key, { value }])));
     (type === 'pointerup' || type === 'pointercancel' ? window : viewport).dispatchEvent(event);
@@ -185,4 +185,54 @@ test('hover stops idle frames and leaving resumes autoplay without a delay', t =
   g.viewport.dispatchEvent(new Event('pointerleave'));
   g.tick(); g.tick();
   assert.notEqual(g.position(), stopped, 'resume on the next animation frames, without a timer');
+});
+
+
+function wheel(g: ReturnType<typeof gallery>, deltaX: number, deltaY: number, deltaMode = 0, buttons = 0) {
+  const event = new Event('wheel', { cancelable: true });
+  Object.assign(event, { deltaX, deltaY, deltaMode, buttons });
+  g.window.dispatchEvent(event);
+  return event;
+}
+
+test('both wheel axes and mouse line/page units drive the gallery while hovered', t => {
+  const g = gallery(t);
+  g.reduced.matches = true;
+  const move = new Event('pointermove');
+  Object.defineProperties(move, { pointerType: { value: 'mouse' }, target: { value: g.image } });
+  g.document.dispatchEvent(move);
+  for (const [dx, dy, mode, expected] of [[0, 100, 0, 100], [-80, 10, 0, -80], [0, 3, 1, 48], [0, -1, 2, -390]]) {
+    const before = g.position();
+    assert.equal(wheel(g, dx, dy, mode).defaultPrevented, true);
+    g.tick();
+    assert.equal(wrap(before - g.position(), 1430), wrap(expected, 1430));
+  }
+});
+
+test('wheel recovers a missing mouse release but does not interrupt a held drag', t => {
+  const g = gallery(t);
+  g.reduced.matches = true;
+  g.pointer('pointerdown', 300, 100, g.image, 'mouse');
+  g.pointer('pointermove', 270, 100, g.image, 'mouse');
+  const before = g.position();
+  assert.equal(wheel(g, 0, 100, 0, 1).defaultPrevented, false);
+  g.tick();
+  assert.equal(g.position(), before);
+  assert.equal(wheel(g, 0, 100).defaultPrevented, true);
+  g.tick();
+  assert.equal(wrap(before - g.position(), 1430), 100);
+  assert.equal(g.root.dataset.dragging, undefined);
+});
+
+test('leaving the browser during a drag releases the gallery for wheel input', t => {
+  const g = gallery(t);
+  g.reduced.matches = true;
+  g.pointer('pointerdown', 300, 100, g.image, 'mouse');
+  g.pointer('pointermove', 270, 100, g.image, 'mouse');
+  g.window.dispatchEvent(new Event('blur'));
+  assert.equal(g.root.dataset.dragging, undefined);
+  const before = g.position();
+  wheel(g, 0, -120);
+  g.tick();
+  assert.equal(wrap(before - g.position(), 1430), wrap(-120, 1430));
 });

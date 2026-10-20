@@ -3,6 +3,8 @@ import { localPath, sitePath } from './paths';
 export function initMenu(menu: HTMLElement) {
   const controller = new AbortController();
   const { signal } = controller;
+  // Prevent native link/image ghosts without interfering with clicks or focus.
+  menu.closest('header')?.addEventListener('dragstart', event => event.preventDefault(), { signal });
   const indicator = menu.querySelector<HTMLElement>('.menu-indicator')!;
   const items = [...menu.querySelectorAll<HTMLElement>('.menu-item, .contact-button')];
   let current = items.find(item => item.hasAttribute('aria-current')) ?? null;

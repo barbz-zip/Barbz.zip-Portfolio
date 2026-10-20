@@ -32,6 +32,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible { background-color:
 .skip-link { position: fixed; left: 16px; top: -100px; z-index: 30; background: #fff; padding: 12px; }
 .skip-link:focus { top: 76px; }
 .site-header { position: absolute; inset: 0 0 auto; height: 84px; z-index: 10; }
+.site-header { user-select: none; -webkit-user-select: none; }
+.site-header a, .site-header img { -webkit-user-drag: none; }
 .zip-mark { position: absolute; left: var(--edge); top: var(--edge); width: 34px; height: 34px; transition: transform 400ms var(--ease); }
 .zip-mark:hover { transform: rotate(-8deg) translateY(-2px); }
 .zip-mark img { display: block; width: 34px; height: 34px; object-fit: cover; }

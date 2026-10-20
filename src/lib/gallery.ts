@@ -22,6 +22,7 @@ export function initGallery(root: HTMLElement) {
   let hovering = false;
   let focused = false;
   let pointer: number | null = null;
+  let pointerType = '';
   let lastX = 0;
   let lastPointerTime = 0;
   let frame = 0;
@@ -108,6 +109,7 @@ export function initGallery(root: HTMLElement) {
     else hovering = false;
     suppressClickUntil = 0;
     pointer = event.pointerId;
+    pointerType = event.pointerType;
     startX = event.clientX;
     startY = event.clientY;
     dragged = false;
@@ -149,6 +151,24 @@ export function initGallery(root: HTMLElement) {
     if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
     schedule();
   }
+  function cancelPointer() {
+    if (pointer === null) return;
+    const id = pointer;
+    pointer = null;
+    if (dragged) suppressClickUntil = performance.now() + 400;
+    delete root.dataset.dragging;
+    velocity = 0;
+    target = position;
+    resumeAt = 0;
+    if (viewport.hasPointerCapture(id)) viewport.releasePointerCapture(id);
+    schedule();
+  }
+  window.addEventListener('blur', () => {
+    cancelPointer();
+    hovering = focused = false;
+    resumeAt = 0;
+    schedule();
+  }, { signal });
   window.addEventListener('pointerup', release, { signal });
   window.addEventListener('pointercancel', release, { signal });
   viewport.addEventListener('lostpointercapture', release, { signal });
@@ -168,7 +188,11 @@ export function initGallery(root: HTMLElement) {
     schedule();
   }, { signal });
   window.addEventListener('wheel', event => {
-    if (modalOpen || event.ctrlKey || event.metaKey || event.defaultPrevented || pointer !== null) return;
+    if (modalOpen || event.ctrlKey || event.metaKey || event.defaultPrevented) return;
+    // A release outside the browser can be lost. An unpressed mouse wheel must
+    // recover that stale drag instead of leaving the gallery unresponsive.
+    if (pointer !== null && pointerType === 'mouse' && event.buttons === 0) cancelPointer();
+    if (pointer !== null) return;
     const horizontal = Math.abs(event.deltaX) > Math.abs(event.deltaY);
     // Either wheel axis drives the gallery, including over the page whitespace.
     // Use the dominant axis so diagonal trackpad gestures are not counted twice.
@@ -181,6 +205,7 @@ export function initGallery(root: HTMLElement) {
   }, { passive: false, signal });
   document.addEventListener('pointermove', event => {
     if (event.pointerType !== 'mouse') return;
+    if (pointerType === 'mouse' && event.buttons === 0) cancelPointer();
     focused = false;
     const image = (event.target as Element).closest('.project-image');
     const overImage = Boolean(image && root.contains(image));
