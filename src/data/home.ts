@@ -2,7 +2,7 @@ import fonts from './home-fonts.mjs';
 import {sanityClient, useLocalContent} from '../lib/cms/client.ts';
 import {homeQuery} from '../lib/cms/queries.ts';
 import {validateFontLinks} from '../lib/google-fonts.mjs';
-export interface HomeContent {siteTitle: string; footerText: string; fonts: string[]; email?: string; readUrl?: string}
+export interface HomeContent {siteTitle: string; footerText: string; fonts: string[]; email?: string; readUrl?: string; wordmarkColor?: string}
 export const localHome: HomeContent = {siteTitle: 'barbz.zip', footerText: 'graphic design and etc.', fonts: [...fonts]};
 export async function getHome(): Promise<HomeContent> {
   if (useLocalContent()) return localHome;

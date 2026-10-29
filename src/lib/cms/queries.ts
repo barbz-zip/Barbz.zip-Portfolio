@@ -1,6 +1,6 @@
 import {defineQuery} from 'groq';
 const image = `alt, crop, hotspot, asset->{_id, url, metadata{dimensions{width, height}}}`;
-export const homeQuery = defineQuery(`*[_id == "home"][0]{siteTitle, footerText, email, readUrl, fonts}`);
+export const homeQuery = defineQuery(`*[_id == "home"][0]{siteTitle, footerText, email, readUrl, fonts, wordmarkColor}`);
 export const projectsQuery = defineQuery(`*[_type == "project"] | order(year desc, title asc, _id asc){
   _id, title, "slug": slug.current, year, description, cover{${image}},
   caseStudy{services, paragraphs, credits[]{role, name}, gallery[]{_key, layout, orientation,

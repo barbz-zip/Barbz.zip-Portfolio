@@ -1,6 +1,7 @@
 ---
 import { sitePath } from '../lib/paths';
 import PortfolioImage from './PortfolioImage.astro';
+import { projectSlides } from '../lib/project-slides';
 import type { Project } from '../data/projects';
 interface Props { projects: Project[] }
 const { projects } = Astro.props;
@@ -14,8 +15,14 @@ const { projects } = Astro.props;
 </dialog>
 {projects.map(project => (
   <template data-project-template={project.id}>
-    <a href={sitePath(`/${project.slug}/`)} class:list={['project-dialog-image', { 'project-dialog-image--ginga': project.id === 'gunga-web' }]} data-open-case aria-label={`Open case study: ${project.title}`}>
-      <PortfolioImage src={project.cover.src} alt={project.cover.alt} position={project.cover.position} widths={[640, 1080, 1600, 2160]} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 95vw, 1054px" />
+    <a href={sitePath(`/${project.slug}/`)} class="project-dialog-image" data-open-case data-project-slideshow aria-label={`Open case study: ${project.title}`} draggable="false">
+      {projectSlides(project).map(image => (
+        <template data-project-slide>
+          <span class="project-dialog-slide" aria-hidden="true">
+            <PortfolioImage src={image.src} alt="" position={image.position} widths={[640, 1080, 1600, 2160]} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 95vw, 1054px" loading="eager" draggable={false} />
+          </span>
+        </template>
+      ))}
       <span class="case-touch-label" aria-hidden="true">open case study</span>
     </a>
     <div class="project-dialog-pills">

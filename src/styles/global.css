@@ -87,8 +87,10 @@ main { min-height: 100svh; position: relative; }
 .project-dialog-close:hover { background: #eee7df; }
 .project-dialog-content { display: flex; flex-direction: column; gap: 10px; }
 .project-dialog-image { position: relative; width: 100%; aspect-ratio: 1054 / 592; border-radius: 12px; overflow: hidden; }
-.project-dialog-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.project-dialog-image--ginga img { position: absolute; width: 100.03%; height: 118.77%; left: -.03%; top: -9.41%; }
+.project-dialog-image { background: var(--menu-bg); isolation: isolate; }
+.project-dialog-slide { position: absolute; inset: 0; display: block; }
+.project-dialog-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.project-dialog-image .case-touch-label { z-index: 2; }
 .project-dialog-pills { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px 16px; }
 .project-pill { margin: 0; padding: 13px 20px; border-radius: 60px; background: var(--menu-bg); font-size: 14px; font-weight: 400; line-height: 14px; overflow-wrap: anywhere; }
 .project-pill:first-child { flex-shrink: 0; max-width: 50%; }

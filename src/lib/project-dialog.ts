@@ -1,3 +1,5 @@
+import { initProjectSlideshow } from './project-slideshow';
+
 export function initProjectDialog() {
   const controller = new AbortController();
   const { signal } = controller;
@@ -10,6 +12,7 @@ export function initProjectDialog() {
   let outsidePress = false;
   let openFrame = 0;
   let closeTimer = 0;
+  let stopSlideshow: (() => void) | undefined;
 
   function notify(open: boolean) {
     document.dispatchEvent(new CustomEvent('project:modal-state', { detail: { open } }));
@@ -25,6 +28,8 @@ export function initProjectDialog() {
     notify(true);
     dialog.showModal();
     dialog.scrollTop = 0;
+    const slideshow = content.querySelector<HTMLElement>('[data-project-slideshow]');
+    stopSlideshow = slideshow ? initProjectSlideshow(slideshow) : undefined;
     // Establish the initial opacity/position before starting the entrance.
     openFrame = requestAnimationFrame(() => {
       openFrame = requestAnimationFrame(() => dialog.dataset.visible = 'true');
@@ -34,6 +39,8 @@ export function initProjectDialog() {
   function close() {
     if (!dialog.open || closing) return;
     closing = true;
+    stopSlideshow?.();
+    stopSlideshow = undefined;
     delete cursor.dataset.visible;
     cancelAnimationFrame(openFrame);
     delete dialog.dataset.visible;
@@ -62,6 +69,7 @@ export function initProjectDialog() {
   dialog.addEventListener('pointerleave', () => delete cursor.dataset.visible, { signal });
   return () => {
     controller.abort();
+    stopSlideshow?.();
     cancelAnimationFrame(openFrame);
     clearTimeout(closeTimer);
     dialog.close();
