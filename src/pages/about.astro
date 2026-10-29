@@ -8,7 +8,10 @@ const about = await getAbout();
   <main id="main" class="about-page">
     <h1 class="sr-only">About — {about.name}</h1>
     <figure class="about-profile">
-      <div class="about-portrait"><PortfolioImage src={about.portrait} alt={about.portraitAlt} widths={[400, 800, 1200]} sizes="(max-width: 800px) 100vw, 392px" fetchpriority="high" /></div>
+      <div class="about-portrait">
+        <PortfolioImage src={about.portrait} alt={about.portraitAlt} widths={[400, 800, 1200]} sizes="(max-width: 800px) 100vw, 392px" fetchpriority="high" draggable={false} />
+        <PortfolioImage class="about-portrait-hover" src="/images/about/barbara-cadorna-hover.jpg" alt="" widths={[400, 800, 1200]} sizes="(max-width: 800px) 100vw, 392px" loading="eager" draggable={false} />
+      </div>
       <figcaption><span>{about.name}</span><br />{about.caption}</figcaption>
     </figure>
     <div class="about-content" lang="en">
