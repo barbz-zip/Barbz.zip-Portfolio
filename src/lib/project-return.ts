@@ -1,18 +1,13 @@
 import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
 
-import { sitePath, localPath } from './paths';
+import { projectReturnPath } from './paths';
 
 const RETURN_KEY = 'barbz-zip:return-to';
-
-function returnPath(path: unknown) {
-  const local = typeof path === 'string' ? localPath(path) : '/';
-  return sitePath(local === '/index' || local === '/index/' ? '/index/' : '/');
-}
 
 export function prepareProjectReturn(event: TransitionBeforeSwapEvent) {
   const back = event.newDocument.querySelector<HTMLAnchorElement>('.case-back');
   if (!back) return;
-  back.setAttribute('href', returnPath(event.navigationType === 'traverse'
+  back.setAttribute('href', projectReturnPath(event.navigationType === 'traverse'
     ? history.state?.[RETURN_KEY]
     : event.from.pathname));
 }
@@ -31,6 +26,6 @@ export function restoreProjectReturn(page: HTMLElement) {
     const referrer = new URL(document.referrer);
     if (referrer.origin === location.origin) origin = referrer.pathname;
   }
-  back.setAttribute('href', returnPath(origin));
+  back.setAttribute('href', projectReturnPath(origin));
   rememberProjectReturn();
 }

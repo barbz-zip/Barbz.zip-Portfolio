@@ -1,26 +1,4 @@
 ---
-import { sitePath } from '../../lib/paths';
-import Layout from '../../layouts/Layout.astro';
-import ProjectCover from '../../components/ProjectCover.astro';
-import { getProjects } from '../../data/projects';
-const projects = await getProjects();
+import { sitePath, PROJECT_INDEX_PATH } from '../../lib/paths';
+return Astro.redirect(sitePath(PROJECT_INDEX_PATH));
 ---
-<Layout page="index" title="barbz.index.zip">
-  <main id="main" class="project-index" data-project-index>
-    <h1 class="sr-only">Index — selected projects</h1>
-    <ul class="index-list" aria-label="Selected projects">
-      {projects.map(project => (
-        <li>
-          <a class="index-row" href={sitePath(`/${project.slug}/`)} data-index-project={project.id}>
-            <span class="index-title">{project.title}</span>
-            <span class="index-year"><span class="sr-only">Year: </span>{project.year}</span>
-            <span class="index-attributes">{project.description.replaceAll(' • ', ' / ')}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-    <div class="index-preview" data-index-preview aria-hidden="true">
-      {projects.map(project => <div data-preview-project={project.id} hidden><ProjectCover cover={project.cover} /></div>)}
-    </div>
-  </main>
-</Layout>

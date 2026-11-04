@@ -27,7 +27,7 @@ test('CMS supports mixed media and optional video posters', () => {
   assert.throws(() => mediaFromSanity({...video, asset: {...video.asset, url: 'https://example.com/video.mp4'}}));
 });
 test('CMS slugs cannot shadow pages or escape the project route', () => {
-  for (const current of ['about', 'dump', 'index', 'studio', '../home', 'two/parts', 'Uppercase']) assert.notEqual(validateProjectSlug({current}), true);
+  for (const current of ['about', 'dump', 'index', 'projects', 'studio', '../home', 'two/parts', 'Uppercase']) assert.notEqual(validateProjectSlug({current}), true);
   assert.equal(validateProjectSlug({current: 'nursegrid-2026'}), true);
 });
 

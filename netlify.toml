@@ -1,6 +1,6 @@
-# Serve the portfolio index instead of Netlify's automatic /index/ → / redirect.
+# Keep old bookmarks working; navigation uses /projects/ to avoid cached redirects.
 [[redirects]]
   from = "/index/"
-  to = "/index/index.html"
-  status = 200
+  to = "/projects/"
+  status = 302
   force = true

@@ -1,4 +1,4 @@
-export const reservedSlugs = ['index', 'about', 'dump', 'read', 'studio', 'admin', '404'];
+export const reservedSlugs = ['index', 'projects', 'about', 'dump', 'read', 'studio', 'admin', '404'];
 export function validateProjectSlug(value) {
   const slug = value?.current;
   if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return 'Use lowercase letters, numbers and hyphens.';
