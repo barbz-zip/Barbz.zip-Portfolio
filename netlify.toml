@@ -1,0 +1,6 @@
+# Serve the portfolio index instead of Netlify's automatic /index/ → / redirect.
+[[redirects]]
+  from = "/index/"
+  to = "/index/index.html"
+  status = 200
+  force = true
