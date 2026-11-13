@@ -51,7 +51,13 @@ export function initMenu(menu: HTMLElement) {
     }) ?? null;
   }
 
+  function syncHomeFooterWidth() {
+    const footer = document.querySelector<HTMLElement>('.is-home .site-footer');
+    footer?.style.setProperty('--menu-width', `${menu.getBoundingClientRect().width}px`);
+  }
+
   function syncRoute() {
+    syncHomeFooterWidth();
     navigation = null;
     pending = hovered = focused = null;
     current = itemForPath(location.pathname);
@@ -82,7 +88,10 @@ export function initMenu(menu: HTMLElement) {
   }, { signal });
   document.addEventListener('astro:after-swap', syncRoute, { signal });
 
-  const observer = new ResizeObserver(positionIndicator);
+  const observer = new ResizeObserver(() => {
+    positionIndicator();
+    syncHomeFooterWidth();
+  });
   observer.observe(menu);
   items.forEach(item => observer.observe(item));
   positionIndicator();

@@ -16,13 +16,20 @@ const { projects } = Astro.props;
 {projects.map(project => (
   <template data-project-template={project.id}>
     <a href={sitePath(`/${project.slug}/`)} class="project-dialog-image" data-open-case data-project-slideshow aria-label={`Open case study: ${project.title}`} draggable="false">
-      {projectSlides(project).map(image => (
+      {projectSlides(project).map(media => (
         <template data-project-slide>
           <span class="project-dialog-slide" aria-hidden="true">
-            <PortfolioImage src={image.src} alt="" position={image.position} widths={[640, 1080, 1600, 2160]} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 95vw, 1054px" loading="eager" draggable={false} />
+            {media.kind === 'video' ? (
+              <video src={media.src} poster={media.poster} muted loop playsinline preload="metadata" disablepictureinpicture></video>
+            ) : <PortfolioImage src={media.src} alt="" position={media.position} widths={[640, 1080, 1600, 2160]} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 95vw, 1054px" loading="eager" draggable={false} />}
           </span>
         </template>
       ))}
+      <template data-project-fallback>
+        <span class="project-dialog-slide" aria-hidden="true">
+          <PortfolioImage src={project.cover.src} alt="" position={project.cover.position} widths={[640, 1080, 1600, 2160]} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 95vw, 1054px" loading="eager" draggable={false} />
+        </span>
+      </template>
       <span class="case-touch-label" aria-hidden="true">open case study</span>
     </a>
     <div class="project-dialog-pills">

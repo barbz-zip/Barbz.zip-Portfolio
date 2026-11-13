@@ -1,0 +1,17 @@
+---
+import { sitePath } from '../lib/paths';
+
+const home = sitePath('/');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0; url=${home}`} />
+    <meta name="robots" content="noindex" />
+    <title>barbz.zip</title>
+  </head>
+  <body>
+    <a href={home}>Return to home</a>
+  </body>
+</html>

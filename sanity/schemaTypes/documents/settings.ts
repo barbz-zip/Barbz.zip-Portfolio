@@ -1,8 +1,9 @@
+import {MediaDocumentInput} from '../../components/MediaDocumentInput';
 import {defineType, defineField} from 'sanity';
 import {CogIcon} from '@sanity/icons/Cog';
 
 export const settings = defineType({
-  name: 'settings', title: 'Settings', type: 'document', icon: CogIcon,
+  name: 'settings', title: 'Settings', type: 'document', components: {input: MediaDocumentInput}, icon: CogIcon,
   groups: [{name: 'identity', title: 'Identity', default: true}, {name: 'sharing', title: 'Sharing'}, {name: 'seo', title: 'SEO'}],
   initialValue: {siteUrl: 'https://barbz-zip.github.io/Barbz.zip-Portfolio/', noIndex: false},
   fields: [

@@ -1,8 +1,9 @@
+import {MediaDocumentInput} from '../../components/MediaDocumentInput';
 import {defineType, defineField, defineArrayMember} from 'sanity';
 import {DocumentIcon} from '@sanity/icons/Document';
 import {validateProjectSlug} from '../validation.mjs';
 export const project = defineType({
-  name: 'project', title: 'Project', type: 'document', icon: DocumentIcon,
+  name: 'project', title: 'Project', type: 'document', components: {input: MediaDocumentInput}, icon: DocumentIcon,
   fields: [
     defineField({name: 'title', title: 'Project name', type: 'string', validation: rule => rule.required()}),
     defineField({name: 'slug', title: 'URL', type: 'slug', options: {source: 'title', maxLength: 96}, validation: rule => rule.required().custom(validateProjectSlug)}),

@@ -4,12 +4,18 @@ import {projectSlides} from '../src/lib/project-slides.ts';
 import {initProjectSlideshow} from '../src/lib/project-slideshow.ts';
 import {getLocalProjects} from '../src/data/projects.ts';
 
-test('preview follows internal image order, removes duplicates and falls back to cover', async () => {
+test('preview keeps horizontal images and video candidates in gallery order', async () => {
   const project = (await getLocalProjects()).find(project => project.slug === 'nursegrid')!;
-  assert.equal(projectSlides(project).length, 2);
-  assert.deepEqual(projectSlides(project).map(image => image.src), [project.caseStudy.gallery[0].images[0].src, project.caseStudy.gallery[1].images[0].src]);
-  assert.deepEqual(projectSlides({...project, caseStudy: {...project.caseStudy, gallery: []}}), [project.cover]);
-  assert.deepEqual(projectSlides({...project, caseStudy: {...project.caseStudy, gallery: [{key: 'video', layout: 'single', orientation: 'original', images: [{kind: 'video', src: '/movie.mp4', alt: 'Movie'}]}]}}), [project.cover]);
+  const first = project.caseStudy.gallery[0].images[0];
+  assert.deepEqual(projectSlides(project), [first]);
+  const video = {kind: 'video' as const, src: '/movie.mp4', alt: 'Movie'};
+  const landscape = {...first, src: '/wide.jpg', width: 900, height: 600};
+  const portrait = {...first, src: '/tall.jpg', width: 600, height: 900};
+  project.caseStudy.gallery = [
+    {key: 'one', layout: 'pair', orientation: 'original', images: [video, landscape]},
+    {key: 'two', layout: 'pair', orientation: 'landscape', images: [portrait, landscape]},
+  ];
+  assert.deepEqual(projectSlides(project), [video, landscape]);
 });
 
 function slideshow(t: TestContext, count = 3) {
@@ -17,10 +23,10 @@ function slideshow(t: TestContext, count = 3) {
   const document = Object.assign(new EventTarget(), {hidden: false});
   const mounted: Array<{id: number; style: {opacity: string}}> = [];
   function slide(id: number) {
-    const element = {id, style: {opacity: ''}, querySelector: () => ({decode: () => Promise.resolve()}), remove() { const at = mounted.indexOf(element); if (at >= 0) mounted.splice(at, 1); }};
+    const element = {id, style: {opacity: ''}, querySelector: (selector: string) => selector === 'img' ? {decode: () => Promise.resolve()} : null, remove() { const at = mounted.indexOf(element); if (at >= 0) mounted.splice(at, 1); }};
     return element;
   }
-  const root = {append: (element: ReturnType<typeof slide>) => mounted.push(element), querySelectorAll: () => Array.from({length: count}, (_, id) => ({content: {firstElementChild: {cloneNode: () => slide(id)}}}))};
+  const root = {querySelector: () => null, append: (element: ReturnType<typeof slide>) => mounted.push(element), querySelectorAll: () => Array.from({length: count}, (_, id) => ({content: {firstElementChild: {cloneNode: () => slide(id)}}}))};
   for (const [key, value] of Object.entries({document, matchMedia: () => ({matches: true})})) {
     const original = Object.getOwnPropertyDescriptor(globalThis, key);
     Object.defineProperty(globalThis, key, {value, configurable: true});
@@ -32,19 +38,19 @@ function slideshow(t: TestContext, count = 3) {
 }
 const flush = async () => {for (let i = 0; i < 5; i++) await Promise.resolve();};
 
-test('slideshow changes every four seconds, loops and only prepares the next image', async t => {
+test('slideshow changes every 1.5 seconds, loops and only prepares the next image', async t => {
   const s = slideshow(t);
   await flush();
   assert.equal(s.active(), 0);
   assert.equal(s.mounted.length, 2);
-  t.mock.timers.tick(3999); await flush();
+  t.mock.timers.tick(1499); await flush();
   assert.equal(s.active(), 0);
   t.mock.timers.tick(1); await flush();
   assert.equal(s.active(), 1);
   assert.equal(s.mounted.length, 2);
-  t.mock.timers.tick(4000); await flush();
+  t.mock.timers.tick(1500); await flush();
   assert.equal(s.active(), 2);
-  t.mock.timers.tick(4000); await flush();
+  t.mock.timers.tick(1500); await flush();
   assert.equal(s.active(), 0);
   s.stop();
   t.mock.timers.tick(8000); await flush();
@@ -61,7 +67,7 @@ test('hidden tab pauses the slideshow and returning starts a fresh viewing inter
   assert.equal(s.active(), 0);
   s.document.hidden = false;
   s.document.dispatchEvent(new Event('visibilitychange'));
-  t.mock.timers.tick(3999); await flush();
+  t.mock.timers.tick(1499); await flush();
   assert.equal(s.active(), 0);
   t.mock.timers.tick(1); await flush();
   assert.equal(s.active(), 1);
@@ -72,6 +78,5 @@ test('a single image stays static and closing before decoding does not start pla
   s.stop();
   await flush();
   t.mock.timers.tick(12000); await flush();
-  assert.equal(s.active(), 0);
-  assert.equal(s.mounted.length, 1);
+  assert.equal(s.mounted.length, 0);
 });

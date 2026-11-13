@@ -1,3 +1,4 @@
+import {MediaDocumentInput} from '../../components/MediaDocumentInput';
 import {defineType, defineField, defineArrayMember} from 'sanity';
 import {UserIcon} from '@sanity/icons/User';
 const linkFields = [
@@ -5,7 +6,7 @@ const linkFields = [
   defineField({name: 'href', title: 'Link', type: 'url', validation: rule => rule.uri({scheme: ['http', 'https']})}),
 ];
 export const about = defineType({
-  name: 'about', title: 'About', type: 'document', icon: UserIcon,
+  name: 'about', title: 'About', type: 'document', components: {input: MediaDocumentInput}, icon: UserIcon,
   fields: [
     defineField({name: 'name', type: 'string', validation: rule => rule.required()}),
     defineField({name: 'caption', title: 'Portrait caption', type: 'string'}),

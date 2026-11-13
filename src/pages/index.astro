@@ -1,10 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Gallery from '../components/Gallery.astro';
+import HomeIntro from '../components/HomeIntro.astro';
 import BouncingWordmark from '../components/BouncingWordmark.astro';
 import { getHomeTypography } from '../data/home-typography';
 import { getProjects } from '../data/projects';
 const projects = await getProjects();
 const typography = await getHomeTypography();
 ---
-<Layout page="home"><main id="main"><h1 class="sr-only">barbz.zip — selected projects</h1><BouncingWordmark typography={typography} /><Gallery projects={projects} /></main></Layout>
+<Layout page="home">
+  {projects.length > 0 && <HomeIntro />}
+  <main id="main">
+    <h1 class="sr-only">barbz.zip — selected projects</h1>
+    <BouncingWordmark typography={typography} />
+    <Gallery projects={projects} />
+  </main>
+</Layout>

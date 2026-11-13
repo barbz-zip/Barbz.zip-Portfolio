@@ -3,10 +3,20 @@ import {ImageIcon} from '@sanity/icons/Image';
 import {PlayIcon} from '@sanity/icons/Play';
 import {validateGalleryRow} from '../validation.mjs';
 
+const generatedAlt = defineField({
+  name: 'generatedAlt', type: 'object', hidden: true,
+  fields: [defineField({name: 'source', type: 'string'}), defineField({name: 'text', type: 'string'})],
+});
+const altField = defineField({
+  name: 'alt', title: 'Alternative text', type: 'string',
+  description: 'Generated from the artwork and editorial context. You can edit this text.',
+  validation: rule => rule.required(),
+});
+
 export const portfolioImage = defineType({
   name: 'portfolioImage', title: 'Image', type: 'image', icon: ImageIcon,
   options: {hotspot: true},
-  fields: [defineField({name: 'alt', title: 'Alternative text', type: 'string', validation: rule => rule.required()})],
+  fields: [altField, generatedAlt],
   validation: rule => rule.assetRequired(),
 });
 export const portfolioVideo = defineType({
@@ -14,8 +24,11 @@ export const portfolioVideo = defineType({
   options: {accept: 'video/mp4,video/webm'},
   description: 'MP4 (H.264) or WebM. Videos play automatically, muted, in a loop, without controls.',
   fields: [
-    defineField({name: 'alt', title: 'Video description', type: 'string', validation: rule => rule.required()}),
-    defineField({name: 'poster', title: 'Poster image', type: 'portfolioImage', description: 'Shown while loading or if autoplay is unavailable.'}),
+    altField, generatedAlt,
+    defineField({name: 'generatedPoster', type: 'object', hidden: true, fields: [
+      defineField({name: 'source', type: 'string'}), defineField({name: 'assetId', type: 'string'}),
+    ]}),
+    defineField({name: 'poster', title: 'Poster image', type: 'portfolioImage', description: 'Created from the first frame. You can replace it with another image.'}),
   ],
   validation: rule => rule.assetRequired(),
 });

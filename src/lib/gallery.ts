@@ -14,6 +14,7 @@ export function initGallery(root: HTMLElement) {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const canHover = window.matchMedia('(hover: hover)');
   let cycle = 0;
+  let viewportWidth = 0;
   let position = 0;
   let target = 0;
   let velocity = 0;
@@ -44,7 +45,10 @@ export function initGallery(root: HTMLElement) {
 
   function measure() {
     const oldCycle = cycle;
-    cycle = group.getBoundingClientRect().width;
+    const groupWidth = group.getBoundingClientRect().width;
+    if (oldCycle === groupWidth && viewportWidth === viewport.clientWidth) return;
+    viewportWidth = viewport.clientWidth;
+    cycle = groupWidth;
     if (!cycle) return;
     const progress = oldCycle ? wrap(position, oldCycle) / oldCycle : 0;
     root.querySelectorAll('[data-copy]').forEach(copy => copy.remove());

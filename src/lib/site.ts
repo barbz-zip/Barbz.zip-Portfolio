@@ -1,5 +1,6 @@
 import { initContact } from './contact';
 import { initGallery } from './gallery';
+import { initHomeIntro } from './home-intro';
 import { initBouncingWordmark } from './bouncing-wordmark';
 import { initDump } from './dump';
 import { initProjectDialog } from './project-dialog';
@@ -34,6 +35,8 @@ document.addEventListener('astro:page-load', () => {
   document.querySelectorAll<HTMLElement>('[data-gallery]').forEach(root => {
     const cleanup = initGallery(root);
     if (cleanup) cleanups.push(cleanup);
+    const finishIntro = initHomeIntro(root);
+    if (finishIntro) cleanups.push(finishIntro);
   });
   document.querySelectorAll<HTMLElement>('[data-wordmark-stage]').forEach(stage => cleanups.push(initBouncingWordmark(stage)));
   if (document.querySelector('[data-project-dialog]')) cleanups.push(initProjectDialog());

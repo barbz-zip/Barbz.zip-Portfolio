@@ -1,7 +1,8 @@
+import {MediaDocumentInput} from '../../components/MediaDocumentInput';
 import {defineType, defineField} from 'sanity';
 import {ImagesIcon} from '@sanity/icons/Images';
 export const dumpItem = defineType({
-  name: 'dumpItem', title: 'Dump image', type: 'document', icon: ImagesIcon,
+  name: 'dumpItem', title: 'Dump image', type: 'document', components: {input: MediaDocumentInput}, icon: ImagesIcon,
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string', validation: rule => rule.required()}),
     defineField({name: 'image', title: 'Image', type: 'portfolioImage', validation: rule => rule.required()}),

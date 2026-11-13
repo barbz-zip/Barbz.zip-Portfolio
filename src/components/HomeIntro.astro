@@ -1,0 +1,56 @@
+---
+import { sitePath } from '../lib/paths';
+---
+<script is:inline data-astro-rerun>
+  (() => {
+    const page = document.body;
+    if (window.barbzZipIntroPlayed || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    window.barbzZipIntroPlayed = true;
+    page.dataset.homeIntro = 'zip';
+    page.dataset.introStart = String(performance.now());
+    // Reveal the working page even if the gallery module fails to load.
+    setTimeout(() => { delete page.dataset.homeIntro; }, 3000);
+  })();
+</script>
+<div class="home-intro" aria-hidden="true">
+  <div class="home-intro-file">
+    <img src={sitePath('/images/zip.png')} alt="" width="348" height="348" draggable="false" />
+    <span>barbz.zip</span>
+  </div>
+</div>
+<style is:global>
+  .home-intro { display: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    body[data-home-intro] .home-intro {
+      display: grid;
+      position: fixed;
+      inset: 0;
+      z-index: 12;
+      place-items: center;
+      pointer-events: none;
+    }
+    .home-intro-file { display: grid; justify-items: center; gap: 5px; }
+    .home-intro-file img {
+      display: block;
+      width: clamp(144px, 21.1vw, 308px);
+      max-width: 38svh;
+      height: auto;
+      animation: zip-tilt 250ms ease-in-out 4 both;
+    }
+    .home-intro-file span { font-size: clamp(14px, 1.25vw, 18px); }
+    body[data-home-intro='zip'] :is(.gallery, .site-header, .site-footer, .wordmark-stage) { visibility: hidden; }
+    body[data-home-intro='open'] .home-intro-file { animation: zip-away 280ms ease-out 280ms both; }
+    body[data-home-intro='open'] .gallery-viewport { animation: intro-fade-in 400ms cubic-bezier(0.22, 0.75, 0.25, 1) both; }
+    body[data-home-intro='open'] :is(.site-header, .site-footer, .wordmark-stage) { animation: intro-fade-in 340ms ease-out 230ms both; }
+    body[data-home-intro] .gallery { pointer-events: none; }
+  }
+  @media (max-width: 600px) {
+    .home-intro-file img { width: clamp(176px, 50vw, 240px); }
+  }
+  @keyframes zip-tilt {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+  @keyframes zip-away { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes intro-fade-in { from { opacity: 0; } to { opacity: 1; } }
+</style>
