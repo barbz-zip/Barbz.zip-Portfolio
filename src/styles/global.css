@@ -6,6 +6,22 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'ABC Diatype Semi-Mono';
+  src: url('../assets/abc-diatype-semi-mono-trial-regular.otf') format('opentype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ABC Diatype Semi-Mono';
+  src: url('../assets/abc-diatype-semi-mono-trial-bold.otf') format('opentype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   font-family: 'ABC Diatype Mono', monospace;
   color: #000;
@@ -111,11 +127,12 @@ main { min-height: 100svh; position: relative; }
 .case-expand { position: fixed; top: 25px; right: 25px; z-index: 20; }
 .case-sidebar { position: fixed; top: 116px; bottom: 25px; left: 25px; width: var(--sidebar-width); padding-right: 25px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; overflow-y: auto; scrollbar-width: none; transition: opacity 240ms, transform 420ms var(--ease); }
 .case-heading { display: flex; flex-direction: column; align-items: flex-start; gap: 41px; }
-.case-heading-copy { max-width: 261px; font-size: 14px; line-height: 1.15; }
+.case-heading-copy, .case-description-copy { font-family: 'ABC Diatype Semi-Mono', monospace; font-size: 14px; line-height: 18px; }
+.case-heading-copy { max-width: 261px; }
 .case-heading-copy h1 { font-size: inherit; line-height: inherit; font-weight: 700; margin: 0 0 6px; }
 .case-heading-copy p { margin: 0; }
 .case-description { display: flex; flex-direction: column; gap: 77px; }
-.case-description-copy { width: 343px; max-width: 100%; font-size: 14px; line-height: 1.001; }
+.case-description-copy { width: 343px; max-width: 100%; }
 .case-description-copy p { margin: 0 0 14px; }
 .case-description-copy p:last-child { margin-bottom: 0; }
 .case-meta { display: flex; align-items: center; justify-content: space-between; min-height: 24px; font-size: 14px; }
@@ -291,9 +308,8 @@ html:has(body.is-dump), body.is-dump { background: #000; color: #e6e6e6; color-s
   .case-back { position: fixed; top: 74px; left: 12px; z-index: 20; padding: 7px 14px 7px 17px; border: 1px solid #0000001a; box-shadow: 0 0 6px #0000000f; }
   .case-sidebar { position: relative; top: auto; bottom: auto; left: auto; width: 100%; padding: 0; gap: 47px; margin-bottom: 33px; overflow: visible; }
   .case-heading { gap: 0; }
-  .case-heading-copy { width: 261px; max-width: 100%; line-height: 17px; }
+  .case-heading-copy { width: 261px; max-width: 100%; }
   .case-heading-copy h1 { margin-bottom: 3px; }
-  .case-description-copy { width: 343px; max-width: 100%; line-height: 17px; }
   .case-description-copy p { margin-bottom: 17px; }
   .case-description-copy p:last-child { margin-bottom: 0; }
   .case-meta { display: none; }
